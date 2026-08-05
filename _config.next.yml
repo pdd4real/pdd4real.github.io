@@ -22,15 +22,25 @@ sidebar:
   position: left
   display: post
 
-# 头像：用你的 GitHub 头像
+# 头像：本地引用（从 GitHub 头像同步，改头像后需重新下载）
 avatar:
-  url: https://github.com/pdd4real.png
+  url: /images/avatar.png
   rounded: true
   rotated: false
 
 # 社交链接
 social:
   GitHub: https://github.com/pdd4real || fab fa-github
+
+# 页脚
+footer:
+  # 不显示 "Powered by Hexo & NexT.Gemini"
+  powered: false
+  icon:
+    # 爱心 → 雪花
+    name: fa fa-snowflake
+    animated: false
+    color: "#7ec8e3"
 
 social_icons:
   enable: true

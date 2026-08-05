@@ -3,7 +3,7 @@ title: Arch Linux × Windows 跨设备远程桌面搭建全记录
 date: 2026-08-05 21:50:00
 updated: 2026-08-05 22:20:00
 categories:
-  - 折腾记录
+  - Linux
 tags:
   - Arch Linux
   - Windows

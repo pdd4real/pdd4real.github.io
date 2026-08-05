@@ -3,9 +3,9 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: pdd4real 的博客
-subtitle: '记录学习与生活'
-description: '用 Hexo 搭建的个人博客'
+title: "Pan's blog"
+subtitle: ''
+description: ''
 keywords:
 author: pdd4real
 language: zh-CN
