@@ -28,11 +28,12 @@
 <meta property="og:description" content="Arch Linux × Windows 跨设备远程桌面搭建全记录 记录一次完整的「Arch Linux (KDE Plasma 6.7.3, Wayland) ↔ Windows 11」双向远程桌面搭建过程：从方案选型、双向配置，到踩过的两个 KDE 上游 bug、若干 Windows 侧坑位，以及最终的连接调优。文中 IP 均已脱敏，实际使用请替换为你的真实地址。  一、背景与需求 Arch">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-05T13:50:00.000Z">
-<meta property="article:modified_time" content="2026-08-05T13:49:33.064Z">
+<meta property="article:modified_time" content="2026-08-05T14:20:00.000Z">
 <meta property="article:author" content="pdd4real">
 <meta property="article:tag" content="Arch Linux">
 <meta property="article:tag" content="KDE">
 <meta property="article:tag" content="RDP">
+<meta property="article:tag" content="Tailscale">
 <meta property="article:tag" content="Wayland">
 <meta property="article:tag" content="Windows">
 <meta property="article:tag" content="远程桌面">
@@ -134,7 +135,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Arch-Linux-%C3%97-Windows-%E8%B7%A8%E8%AE%BE%E5%A4%87%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E6%90%AD%E5%BB%BA%E5%85%A8%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">Arch Linux × Windows 跨设备远程桌面搭建全记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF%E4%B8%8E%E9%9C%80%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景与需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%96%B9%E5%90%91%E4%B8%80%EF%BC%9AWindows-%E2%86%92-Arch%EF%BC%88krdp%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">二、方向一：Windows → Arch（krdp）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 服务端配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Bug-%E4%B8%80%EF%BC%9Amstsc-%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%EF%BC%88KDE-Bug-511557%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Bug 一：mstsc 无法连接（KDE Bug 511557）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Bug-%E4%BA%8C%EF%BC%9APAM-%E8%AE%A4%E8%AF%81%E5%A4%B1%E8%B4%A5%EF%BC%8C%E9%BB%91%E7%AA%97%E9%97%AA%E9%80%80%EF%BC%88KDE-Bug-521776%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Bug 二：PAM 认证失败，黑窗闪退（KDE Bug 521776）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E9%99%84%E5%B8%A6%E5%9D%91%EF%BC%9Apam-faillock-%E8%B4%A6%E6%88%B7%E9%94%81%E5%AE%9A"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 附带坑：pam_faillock 账户锁定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%96%B9%E5%90%91%E4%BA%8C%EF%BC%9AArch-%E2%86%92-Windows%EF%BC%88Windows-RDP-Host%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">三、方向二：Arch → Windows（Windows RDP Host）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Windows-%E7%AB%AF%E5%89%8D%E7%BD%AE%E6%A3%80%E6%9F%A5"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Windows 端前置检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%A4%A7%E5%9D%91%EF%BC%9A3389-%E6%97%A0-LISTEN%EF%BC%8C%E9%87%8D%E5%90%AF%E6%89%8D%E6%81%A2%E5%A4%8D"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 大坑：3389 无 LISTEN，重启才恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-KRDC-%E8%BF%9E%E6%8E%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 KRDC 连接配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E8%BF%9E%E6%8E%A5%E6%85%A2%EF%BC%9AWindows-%E5%8F%8D%E5%90%91-DNS-%E8%A7%A3%E6%9E%90"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 连接慢：Windows 反向 DNS 解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E6%A1%8C%E9%9D%A2%E5%B8%83%E5%B1%80%E4%B8%8E%E7%BC%A9%E6%94%BE%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5 桌面布局与缩放不一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-RDP-%E4%BC%9A%E8%AF%9D%E9%9A%94%E7%A6%BB%EF%BC%9A%E7%89%A9%E7%90%86%E6%A1%8C%E9%9D%A2%E7%9C%8B%E4%B8%8D%E5%88%B0"><span class="nav-number">1.3.6.</span> <span class="nav-text">3.6 RDP 会话隔离：物理桌面看不到</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%B8%A9%E5%9D%91%E6%B8%85%E5%8D%95%E9%80%9F%E6%9F%A5"><span class="nav-number">1.4.</span> <span class="nav-text">四、踩坑清单速查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%9C%80%E7%BB%88%E5%BD%A2%E6%80%81"><span class="nav-number">1.5.</span> <span class="nav-text">五、最终形态</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Arch-Linux-%C3%97-Windows-%E8%B7%A8%E8%AE%BE%E5%A4%87%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E6%90%AD%E5%BB%BA%E5%85%A8%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">Arch Linux × Windows 跨设备远程桌面搭建全记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF%E4%B8%8E%E9%9C%80%E6%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景与需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%96%B9%E5%90%91%E4%B8%80%EF%BC%9AWindows-%E2%86%92-Arch%EF%BC%88krdp%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">二、方向一：Windows → Arch（krdp）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 服务端配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Bug-%E4%B8%80%EF%BC%9Amstsc-%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%EF%BC%88KDE-Bug-511557%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Bug 一：mstsc 无法连接（KDE Bug 511557）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Bug-%E4%BA%8C%EF%BC%9APAM-%E8%AE%A4%E8%AF%81%E5%A4%B1%E8%B4%A5%EF%BC%8C%E9%BB%91%E7%AA%97%E9%97%AA%E9%80%80%EF%BC%88KDE-Bug-521776%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Bug 二：PAM 认证失败，黑窗闪退（KDE Bug 521776）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E9%99%84%E5%B8%A6%E5%9D%91%EF%BC%9Apam-faillock-%E8%B4%A6%E6%88%B7%E9%94%81%E5%AE%9A"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 附带坑：pam_faillock 账户锁定</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%96%B9%E5%90%91%E4%BA%8C%EF%BC%9AArch-%E2%86%92-Windows%EF%BC%88Windows-RDP-Host%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">三、方向二：Arch → Windows（Windows RDP Host）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Windows-%E7%AB%AF%E5%89%8D%E7%BD%AE%E6%A3%80%E6%9F%A5"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Windows 端前置检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%A4%A7%E5%9D%91%EF%BC%9A3389-%E6%97%A0-LISTEN%EF%BC%8C%E9%87%8D%E5%90%AF%E6%89%8D%E6%81%A2%E5%A4%8D"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 大坑：3389 无 LISTEN，重启才恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-KRDC-%E8%BF%9E%E6%8E%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 KRDC 连接配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E8%BF%9E%E6%8E%A5%E6%85%A2%EF%BC%9AWindows-%E5%8F%8D%E5%90%91-DNS-%E8%A7%A3%E6%9E%90"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 连接慢：Windows 反向 DNS 解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E6%A1%8C%E9%9D%A2%E5%B8%83%E5%B1%80%E4%B8%8E%E7%BC%A9%E6%94%BE%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5 桌面布局与缩放不一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-RDP-%E4%BC%9A%E8%AF%9D%E9%9A%94%E7%A6%BB%EF%BC%9A%E7%89%A9%E7%90%86%E6%A1%8C%E9%9D%A2%E7%9C%8B%E4%B8%8D%E5%88%B0"><span class="nav-number">1.3.6.</span> <span class="nav-text">3.6 RDP 会话隔离：物理桌面看不到</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%B8%A9%E5%9D%91%E6%B8%85%E5%8D%95%E9%80%9F%E6%9F%A5"><span class="nav-number">1.4.</span> <span class="nav-text">四、踩坑清单速查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%9C%80%E7%BB%88%E5%BD%A2%E6%80%81"><span class="nav-number">1.5.</span> <span class="nav-text">五、最终形态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E8%B7%A8%E7%BD%91%E7%BB%9C%E6%96%B9%E6%A1%88%EF%BC%9ATailscale"><span class="nav-number">1.6.</span> <span class="nav-text">六、跨网络方案：Tailscale</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Tailscale-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.6.1.</span> <span class="nav-text">6.1 Tailscale 是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-Arch-%E7%AB%AF%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="nav-number">1.6.2.</span> <span class="nav-text">6.2 Arch 端安装与配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-Windows-%E7%AB%AF%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="nav-number">1.6.3.</span> <span class="nav-text">6.3 Windows 端安装与配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-%E7%94%A8-KRDC-%E8%B7%A8%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.6.4.</span> <span class="nav-text">6.4 用 KRDC 跨网络连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0"><span class="nav-number">1.6.5.</span> <span class="nav-text">6.5 原理简述</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -160,7 +161,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -222,7 +223,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2026-08-05 21:50:00 / 修改时间：21:49:33" itemprop="dateCreated datePublished" datetime="2026-08-05T21:50:00+08:00">2026-08-05</time>
+      <time title="创建时间：2026-08-05 21:50:00 / 修改时间：22:20:00" itemprop="dateCreated datePublished" datetime="2026-08-05T21:50:00+08:00">2026-08-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -447,8 +448,60 @@
 <li><strong>Arch → Windows</strong>：KRDC + Windows RDP Host（重启后正常监听 3389），连接成功，秒进桌面</li>
 <li>两个方向均验证可用</li>
 </ul>
+<h2 id="六、跨网络方案：Tailscale"><a href="#六、跨网络方案：Tailscale" class="headerlink" title="六、跨网络方案：Tailscale"></a>六、跨网络方案：Tailscale</h2><p>上面的方案只能在家用，出门就没法连了——因为 Windows 在路由器 NAT 后面，公网摸不到它的 3389。这里用 Tailscale 打通跨网络 RDP。</p>
+<h3 id="6-1-Tailscale-是什么"><a href="#6-1-Tailscale-是什么" class="headerlink" title="6.1 Tailscale 是什么"></a>6.1 Tailscale 是什么</h3><p>Tailscale 基于 WireGuard 建立加密隧道，给每台加入的设备分配一个虚拟内网 IP（<code>100.x.x.x</code>），所有设备之间通过这个虚拟 IP 直接通信，底层是 WireGuard 点对点加密，无需暴露任何公网端口。免费方案支持 100 台设备，对个人使用完全够用。</p>
+<p>KRDC 用 Tailscale IP 连 RDP 的逻辑跟局域网完全一致——客户端根本不关心你给的是物理 IP 还是虚拟 IP，只要网络层通就行。</p>
+<h3 id="6-2-Arch-端安装与配置"><a href="#6-2-Arch-端安装与配置" class="headerlink" title="6.2 Arch 端安装与配置"></a>6.2 Arch 端安装与配置</h3><p>安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S tailscale</span><br></pre></td></tr></table></figure>
+
+<p>启动服务并设为开机自启：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> --now tailscaled</span><br></pre></td></tr></table></figure>
+
+<p>登录认证（会输出一个链接，浏览器打开，用 Google &#x2F; GitHub &#x2F; Microsoft 账号登录）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tailscale up</span><br></pre></td></tr></table></figure>
+
+<p>认证完成后验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tailscale status</span><br></pre></td></tr></table></figure>
+
+<p>输出示例（IP 脱敏）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">100.x.y.z  archlinux  user@  linux   -</span><br></pre></td></tr></table></figure>
+
+<p>对应设备拿到的就是 <code>100.x.y.z</code> 这个虚拟 IP。</p>
+<h3 id="6-3-Windows-端安装与配置"><a href="#6-3-Windows-端安装与配置" class="headerlink" title="6.3 Windows 端安装与配置"></a>6.3 Windows 端安装与配置</h3><ol>
+<li>打开 <a target="_blank" rel="noopener" href="https://tailscale.com/download/windows">https://tailscale.com/download/windows</a> ，下载安装</li>
+<li>用<strong>同一个账号</strong>登录</li>
+<li>安装完成弹出 “open local settings &#x2F; open admin console &#x2F; close” 时，直接选 <strong>close</strong></li>
+</ol>
+<p>回到 Arch 端再次执行 <code>tailscale status</code>，确认两台设备都在网络内：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">100.x.y.z  archlinux  user@  linux    -</span><br><span class="line">100.a.b.c  pdd        user@  windows  -</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-用-KRDC-跨网络连接"><a href="#6-4-用-KRDC-跨网络连接" class="headerlink" title="6.4 用 KRDC 跨网络连接"></a>6.4 用 KRDC 跨网络连接</h3><p>现在 KRDC 的「服务器地址」不再填局域网 IP，改成填 Windows 的 Tailscale IP：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>服务器 &#x2F; Host</td>
+<td><code>100.a.b.c:3389</code>（Windows 在 <code>tailscale status</code> 里显示的 IP）</td>
+</tr>
+<tr>
+<td>username</td>
+<td>同局域网配置（Windows 登录账号名）</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>留空</td>
+</tr>
+</tbody></table>
+<p>其余配置完全不变。无论是在家、在公司、在星巴克，只要两台设备都有网，KRDC 就能连上。</p>
+<h3 id="6-5-原理简述"><a href="#6-5-原理简述" class="headerlink" title="6.5 原理简述"></a>6.5 原理简述</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">┌──────────┐          Tailscale 隧道          ┌──────────┐</span><br><span class="line">│   KRDC   │ ──── 100.x.y.z ═══════ 100.a.b.c ──── │  Windows  │</span><br><span class="line">│  (Arch)  │  TCP 3389 走加密的 WireGuard 链路    │  RDP Host │</span><br><span class="line">└──────────┘                                    └──────────┘</span><br></pre></td></tr></table></figure>
+
+<p>KRDC 不需要任何特殊配置——它只知道要连 <code>100.a.b.c:3389</code> 这个 RDP 端点，至于数据包怎么过去的是 Tailscale 的事。底层的 WireGuard 隧道保证了跨公网也能端到端加密通信，同时不用在路由器上开放任何端口。</p>
 <blockquote>
-<p>本次仅覆盖局域网场景。跨网络（非局域网）场景属于另一套方案（Tailscale &#x2F; 自托管 RustDesk），不在本文范围内。</p>
+<p>本文覆盖局域网（一至五节）与跨网络（第六节）两个场景。自托管 RustDesk 是另一种备选方案，需要额外维护一台中继服务器，在本文不展开。</p>
 </blockquote>
 
     </div>
@@ -465,6 +518,7 @@
               <a href="/tags/RDP/" rel="tag"># RDP</a>
               <a href="/tags/KDE/" rel="tag"># KDE</a>
               <a href="/tags/Wayland/" rel="tag"># Wayland</a>
+              <a href="/tags/Tailscale/" rel="tag"># Tailscale</a>
           </div>
 
         
