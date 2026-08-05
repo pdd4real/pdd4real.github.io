@@ -46,3 +46,12 @@ social_icons:
   enable: true
   icons_only: false
   transition: true
+
+# 数学公式：由 hexo-filter-mathjax 转换为 MathJax 可渲染的 HTML
+math:
+  every_page: false
+  mathjax:
+    enable: true
+    tags: ams
+
+# 颜色方案暂不在这里固定，待确认预览方案后只替换配色变量

@@ -2,6 +2,8 @@
 title: L1/L2 正则化、Frobenius 范数与 RegMean
 date: 2026-08-05 23:08:00
 updated: 2026-08-05 23:08:00
+description: 整理 L1/L2 正则化、Frobenius 范数与 RegMean 正则项的基本概念和联系。
+mathjax: true
 categories:
   - 机器学习
 tags:
@@ -14,6 +16,8 @@ tags:
 # L1/L2 正则化、Frobenius 范数与 RegMean
 
 本文整理 L1、L2 正则化的基本概念，并补充 Frobenius 范数与矩阵迹的关系，以及 RegMean 正则项和传统 L2 正则化之间的区别。
+
+<!-- more -->
 
 
 
