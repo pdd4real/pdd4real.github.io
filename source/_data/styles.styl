@@ -38,8 +38,10 @@ a
 a:hover
   color: #C7EAFF
 
-.header
+header.header
   background: #102E49
+  border-radius: 14px !important
+  overflow: hidden
 
 .site-meta
   background: #102E49
@@ -59,8 +61,13 @@ a:hover
   color: #EAF4FC
 
 .sidebar
-  background: #102E49
+  background: transparent
   color: #EAF4FC
+
+.sidebar-inner
+  background: #102E49
+  border-radius: 14px !important
+  overflow: hidden
 
 .sidebar a,
 .sidebar-nav li a,
@@ -131,8 +138,9 @@ a:hover
   color: #A9C9DD
 
 // Rounded panels
-.header-inner,
+header.header,
 .main-inner .post-block,
+.main-inner .post-block:not(:first-child):not(:first-child),
 .main-inner .tabs-comment,
 .main-inner > .comments,
 .main-inner .comment-position .comments,
@@ -177,11 +185,12 @@ a:hover
   padding: 5px 13px
 
 @media (max-width: 767px)
-  .header-inner,
+  header.header,
   .main-inner .post-block,
+  .main-inner .post-block:not(:first-child):not(:first-child),
   .main-inner .pagination,
   .sidebar-inner
-    border-radius: 10px
+    border-radius: 10px !important
 
   .main-inner.index .post-block
     margin-top: 10px !important
