@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-<link rel="stylesheet" href="/css/main.css?v=07a08fe34b">
+<link rel="stylesheet" href="/css/main.css?v=533b621bc1">
 
 
 
@@ -249,7 +249,7 @@ mjx-container[display="true"] + br {
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Fish-Shell-%E4%B8%8B%E7%BC%96%E8%AF%91-SDL2-%E7%9A%84-undefined-reference-%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">Fish Shell 下编译 SDL2 的 undefined reference 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-pkg-config-%E5%88%B0%E5%BA%95%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%94%A8%E7%9A%84%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1. pkg-config 到底是干什么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%EF%BC%9Apkg-config-cflags-libs-sdl2"><span class="nav-number">1.1.1.</span> <span class="nav-text">参数解析：pkg-config --cflags --libs sdl2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Fish-Shell-%E7%9A%84%E5%91%BD%E4%BB%A4%E6%9B%BF%E6%8D%A2%E8%A7%A3%E6%9E%90%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">2. Fish Shell 的命令替换解析机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88-eval-%E6%88%96-string-split-%E8%83%BD%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">1.3.</span> <span class="nav-text">3. 为什么 eval 或 string split 能解决问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-A%EF%BC%9Astring-split"><span class="nav-number">1.3.1.</span> <span class="nav-text">原理 A：string split</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-B%EF%BC%9Aeval"><span class="nav-number">1.3.2.</span> <span class="nav-text">原理 B：eval</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-pkg-config-%E5%88%B0%E5%BA%95%E6%98%AF%E5%B9%B2%E4%BB%80%E4%B9%88%E7%94%A8%E7%9A%84%EF%BC%9F"><span class="nav-text">1. pkg-config 到底是干什么用的？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90%EF%BC%9Apkg-config-cflags-libs-sdl2"><span class="nav-text">参数解析：pkg-config --cflags --libs sdl2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Fish-Shell-%E7%9A%84%E5%91%BD%E4%BB%A4%E6%9B%BF%E6%8D%A2%E8%A7%A3%E6%9E%90%E6%9C%BA%E5%88%B6"><span class="nav-text">2. Fish Shell 的命令替换解析机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88-eval-%E6%88%96-string-split-%E8%83%BD%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-text">3. 为什么 eval 或 string split 能解决问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-A%EF%BC%9Astring-split"><span class="nav-text">原理 A：string split</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-B%EF%BC%9Aeval"><span class="nav-text">原理 B：eval</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -264,7 +264,7 @@ mjx-container[display="true"] + br {
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -358,7 +358,7 @@ mjx-container[display="true"] + br {
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="Fish-Shell-下编译-SDL2-的-undefined-reference-问题"><a href="#Fish-Shell-下编译-SDL2-的-undefined-reference-问题" class="headerlink" title="Fish Shell 下编译 SDL2 的 undefined reference 问题"></a>Fish Shell 下编译 SDL2 的 undefined reference 问题</h1><p>C&#x2F;C++ 编译过程分为编译（Compile）和链接（Link）两个独立阶段。本文从一次 SDL2 链接报错出发，梳理 <code>pkg-config</code>、GCC 参数以及 Fish Shell 命令替换之间的关系。</p>
+    <div class="post-body" itemprop="articleBody"><p>C&#x2F;C++ 编译过程分为编译（Compile）和链接（Link）两个独立阶段。本文从一次 SDL2 链接报错出发，梳理 <code>pkg-config</code>、GCC 参数以及 Fish Shell 命令替换之间的关系。</p>
 <span id="more"></span>
 
 <h2 id="1-pkg-config-到底是干什么用的？"><a href="#1-pkg-config-到底是干什么用的？" class="headerlink" title="1. pkg-config 到底是干什么用的？"></a>1. <code>pkg-config</code> 到底是干什么用的？</h2><p>在 Linux 下使用第三方库（如 SDL2）时，库的头文件（<code>.h</code>）和动态链接库文件（<code>.so</code>）通常散落在系统的各个角落。让程序员手动去查这些路径非常折磨人。</p>
@@ -429,8 +429,8 @@ mjx-container[display="true"] + br {
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/08/05/arch-windows-remote-desktop/" rel="prev" title="Arch Linux × Windows 跨设备远程桌面搭建全记录">
-                  <i class="fa fa-angle-left"></i> Arch Linux × Windows 跨设备远程桌面搭建全记录
+                <a href="/2026/08/05/gcn-and-gat-notes/" rel="prev" title="从 GCN 到 GAT：公式、直觉与代码笔记">
+                  <i class="fa fa-angle-left"></i> 从 GCN 到 GAT：公式、直觉与代码笔记
                 </a>
             </div>
             <div class="post-nav-item">

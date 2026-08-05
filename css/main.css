@@ -1386,7 +1386,7 @@ pre code {
     transition: all 0.2s ease-in-out;
   }
   .links-of-author a::before {
-    background: #c4acfc;
+    background: #fef;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2917,6 +2917,15 @@ header.header {
 .sidebar-inner {
   border-radius: 14px !important;
   overflow: hidden;
+}
+.post-body mjx-container[display='true'] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+.post-body mjx-container[display='true'] > svg {
+  max-width: none;
 }
 header.header,
 .main-inner .post-block,
