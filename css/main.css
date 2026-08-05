@@ -13,7 +13,7 @@
   --table-row-odd-bg-color: #f9f9f9;
   --table-row-hover-bg-color: #f5f5f5;
   --menu-item-bg-color: #f5f5f5;
-  --theme-color: #6fa9d8;
+  --theme-color: #3e7cb1;
   --btn-default-bg: #fff;
   --btn-default-color: #555;
   --btn-default-border-color: #555;
@@ -42,7 +42,7 @@
     --table-row-odd-bg-color: #282828;
     --table-row-hover-bg-color: #363636;
     --menu-item-bg-color: #555;
-    --theme-color: #355d7a;
+    --theme-color: #244e70;
     --btn-default-bg: #222;
     --btn-default-color: #ccc;
     --btn-default-border-color: #555;
@@ -1386,7 +1386,7 @@ pre code {
     transition: all 0.2s ease-in-out;
   }
   .links-of-author a::before {
-    background: #c9ff1b;
+    background: #ff6157;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2912,32 +2912,32 @@ header.header {
   }
 }
 :root {
-  --body-bg-color: #f7fbff;
+  --body-bg-color: #f1f8fd;
   --content-bg-color: #fff;
-  --card-bg-color: #eaf4fc;
-  --text-color: #526b7d;
-  --selection-bg: #bbdcf4;
-  --selection-color: #24445d;
-  --blockquote-color: #6b879d;
-  --link-color: #4b91c5;
-  --link-hover-color: #2f6f9d;
-  --brand-color: #24445d;
-  --brand-hover-color: #2f6f9d;
-  --table-row-odd-bg-color: #f4faff;
-  --table-row-hover-bg-color: #eaf4fc;
-  --menu-item-bg-color: #eaf4fc;
-  --theme-color: #6fa9d8;
-  --btn-default-bg: #6fa9d8;
+  --card-bg-color: #dcecf8;
+  --text-color: #3e596e;
+  --selection-bg: #a8cbe5;
+  --selection-color: #1f405c;
+  --blockquote-color: #58758c;
+  --link-color: #2f6f9f;
+  --link-hover-color: #225477;
+  --brand-color: #1f405c;
+  --brand-hover-color: #225477;
+  --table-row-odd-bg-color: #edf6fc;
+  --table-row-hover-bg-color: #dcecf8;
+  --menu-item-bg-color: #dcecf8;
+  --theme-color: #3e7cb1;
+  --btn-default-bg: #3e7cb1;
   --btn-default-color: #fff;
-  --btn-default-border-color: #6fa9d8;
-  --btn-default-hover-bg: #4b91c5;
+  --btn-default-border-color: #3e7cb1;
+  --btn-default-hover-bg: #2f6f9f;
   --btn-default-hover-color: #fff;
-  --btn-default-hover-border-color: #4b91c5;
+  --btn-default-hover-border-color: #2f6f9f;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --theme-color: #355d7a;
-    --link-color: #9cc9ea;
-    --link-hover-color: #c5e4f7;
+    --theme-color: #244e70;
+    --link-color: #a7d0ed;
+    --link-hover-color: #d0e8f8;
   }
 }
