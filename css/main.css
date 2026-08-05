@@ -1386,7 +1386,7 @@ pre code {
     transition: all 0.2s ease-in-out;
   }
   .links-of-author a::before {
-    background: #18c486;
+    background: #4ed95d;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -3042,4 +3042,63 @@ a:hover {
 .footer,
 .footer a {
   color: #a9c9dd;
+}
+.header-inner,
+.main-inner .post-block,
+.main-inner .tabs-comment,
+.main-inner > .comments,
+.main-inner .comment-position .comments,
+.main-inner .pagination,
+.sidebar-inner {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.main-inner .post-block,
+.main-inner .pagination {
+  box-shadow: 0 8px 22px rgba(2,15,28,0.24);
+}
+.main-inner.index .post-block {
+  margin-top: 14px !important;
+  padding: 22px 30px;
+}
+.main-inner.index .post-block:first-child {
+  margin-top: 0 !important;
+}
+.main-inner.index .post-header {
+  margin-bottom: 8px;
+}
+.main-inner.index .post-title {
+  font-size: 1.35em;
+  margin: 0 0 5px;
+}
+.main-inner.index .post-meta-container {
+  margin-top: 4px;
+}
+.main-inner.index .post-body {
+  margin-top: 8px;
+}
+.main-inner.index .post-body p {
+  margin: 0 0 8px;
+}
+.main-inner.index .post-button {
+  margin-top: 8px;
+}
+.main-inner.index .post-button .btn {
+  border-radius: 8px;
+  padding: 5px 13px;
+}
+@media (max-width: 767px) {
+  .header-inner,
+  .main-inner .post-block,
+  .main-inner .pagination,
+  .sidebar-inner {
+    border-radius: 10px;
+  }
+  .main-inner.index .post-block {
+    margin-top: 10px !important;
+    padding: 16px;
+  }
+  .main-inner.index .post-title {
+    font-size: 1.2em;
+  }
 }
