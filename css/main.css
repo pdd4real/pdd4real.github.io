@@ -13,7 +13,7 @@
   --table-row-odd-bg-color: #f9f9f9;
   --table-row-hover-bg-color: #f5f5f5;
   --menu-item-bg-color: #f5f5f5;
-  --theme-color: #222;
+  --theme-color: #6fa9d8;
   --btn-default-bg: #fff;
   --btn-default-color: #555;
   --btn-default-border-color: #555;
@@ -42,7 +42,7 @@
     --table-row-odd-bg-color: #282828;
     --table-row-hover-bg-color: #363636;
     --menu-item-bg-color: #555;
-    --theme-color: #222;
+    --theme-color: #355d7a;
     --btn-default-bg: #222;
     --btn-default-color: #ccc;
     --btn-default-border-color: #555;
@@ -1386,7 +1386,7 @@ pre code {
     transition: all 0.2s ease-in-out;
   }
   .links-of-author a::before {
-    background: #c3c85e;
+    background: #c9ff1b;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2909,5 +2909,35 @@ header.header {
   }
   .comments {
     padding: 10px 12px;
+  }
+}
+:root {
+  --body-bg-color: #f7fbff;
+  --content-bg-color: #fff;
+  --card-bg-color: #eaf4fc;
+  --text-color: #526b7d;
+  --selection-bg: #bbdcf4;
+  --selection-color: #24445d;
+  --blockquote-color: #6b879d;
+  --link-color: #4b91c5;
+  --link-hover-color: #2f6f9d;
+  --brand-color: #24445d;
+  --brand-hover-color: #2f6f9d;
+  --table-row-odd-bg-color: #f4faff;
+  --table-row-hover-bg-color: #eaf4fc;
+  --menu-item-bg-color: #eaf4fc;
+  --theme-color: #6fa9d8;
+  --btn-default-bg: #6fa9d8;
+  --btn-default-color: #fff;
+  --btn-default-border-color: #6fa9d8;
+  --btn-default-hover-bg: #4b91c5;
+  --btn-default-hover-color: #fff;
+  --btn-default-hover-border-color: #4b91c5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --theme-color: #355d7a;
+    --link-color: #9cc9ea;
+    --link-hover-color: #c5e4f7;
   }
 }
