@@ -1,0 +1,38 @@
+# =====================================================
+# NexT 主题自定义配置（会覆盖 themes/next/_config.yml 的对应项）
+# 文档: https://theme-next.js.org/docs/theme-settings/
+# =====================================================
+
+# 布局方案：Gemini —— 经典的单栏 + 侧边栏
+scheme: Gemini
+
+# 暗黑模式（页面右上角有明暗切换按钮）
+darkmode: true
+
+# 导航菜单
+menu:
+  home: / || fa fa-home
+  about: /about/ || fa fa-user
+  tags: /tags/ || fa fa-tags
+  categories: /categories/ || fa fa-th
+  archives: /archives/ || fa fa-archive
+
+# 侧边栏
+sidebar:
+  position: left
+  display: post
+
+# 头像：用你的 GitHub 头像
+avatar:
+  url: https://github.com/pdd4real.png
+  rounded: true
+  rotated: false
+
+# 社交链接
+social:
+  GitHub: https://github.com/pdd4real || fab fa-github
+
+social_icons:
+  enable: true
+  icons_only: false
+  transition: true
