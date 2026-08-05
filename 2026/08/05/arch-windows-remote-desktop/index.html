@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Arch Linux × Windows 跨设备远程桌面搭建全记录 | pdd4real 的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Arch Linux × Windows 跨设备远程桌面搭建全记录 记录一次完整的「Arch Linux (KDE Plasma 6.7.3, Wayland) ↔ Windows 11」双向远程桌面搭建过程：从方案选型、双向配置，到踩过的两个 KDE 上游 bug、若干 Windows 侧坑位，以及最终的连接调优。文中 IP 均已脱敏，实际使用请替换为你的真实地址。  一、背景与需求 Arch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Arch Linux × Windows 跨设备远程桌面搭建全记录">
+<meta property="og:url" content="https://pdd4real.github.io/2026/08/05/arch-windows-remote-desktop/index.html">
+<meta property="og:site_name" content="pdd4real 的博客">
+<meta property="og:description" content="Arch Linux × Windows 跨设备远程桌面搭建全记录 记录一次完整的「Arch Linux (KDE Plasma 6.7.3, Wayland) ↔ Windows 11」双向远程桌面搭建过程：从方案选型、双向配置，到踩过的两个 KDE 上游 bug、若干 Windows 侧坑位，以及最终的连接调优。文中 IP 均已脱敏，实际使用请替换为你的真实地址。  一、背景与需求 Arch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-05T13:50:00.000Z">
+<meta property="article:modified_time" content="2026-08-05T13:49:33.064Z">
+<meta property="article:author" content="pdd4real">
+<meta property="article:tag" content="Arch Linux">
+<meta property="article:tag" content="KDE">
+<meta property="article:tag" content="RDP">
+<meta property="article:tag" content="Wayland">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="远程桌面">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="pdd4real 的博客" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">pdd4real 的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">记录学习与生活</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS 订阅"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="搜索"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://pdd4real.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-arch-windows-remote-desktop" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/08/05/arch-windows-remote-desktop/" class="article-date">
+  <time class="dt-published" datetime="2026-08-05T13:50:00.000Z" itemprop="datePublished">2026-08-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">折腾记录</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Arch Linux × Windows 跨设备远程桌面搭建全记录
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Arch-Linux-×-Windows-跨设备远程桌面搭建全记录"><a href="#Arch-Linux-×-Windows-跨设备远程桌面搭建全记录" class="headerlink" title="Arch Linux × Windows 跨设备远程桌面搭建全记录"></a>Arch Linux × Windows 跨设备远程桌面搭建全记录</h1><blockquote>
+<p>记录一次完整的「Arch Linux (KDE Plasma 6.7.3, Wayland) ↔ Windows 11」双向远程桌面搭建过程：从方案选型、双向配置，到踩过的两个 KDE 上游 bug、若干 Windows 侧坑位，以及最终的连接调优。文中 IP 均已脱敏，实际使用请替换为你的真实地址。</p>
+</blockquote>
+<h2 id="一、背景与需求"><a href="#一、背景与需求" class="headerlink" title="一、背景与需求"></a>一、背景与需求</h2><ul>
+<li><strong>Arch 本机</strong>：KDE Plasma 6.7.3，Wayland 会话，主机名 <code>&lt;ARCH_HOST&gt;</code>，内网 IP <code>&lt;ARCH_IP&gt;</code></li>
+<li><strong>Windows 机器</strong>：Windows 11 25H2，<code>ProfessionalWorkstation</code> 版本，内网 IP <code>&lt;WIN_IP&gt;</code></li>
+<li><strong>需求</strong>：跨设备远程桌面，两个方向都要能连</li>
+</ul>
+<p>架构选型：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>服务端</th>
+<th>客户端</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Windows → Arch</td>
+<td>krdp（Plasma Wayland 原生 RDP 服务器）</td>
+<td>Thincast Remote Desktop Client</td>
+</tr>
+<tr>
+<td>Arch → Windows</td>
+<td>Windows 原生 RDP Host</td>
+<td>KRDC（KDE RDP 客户端）</td>
+</tr>
+</tbody></table>
+<p>选 krdp 的原因：它是 KDE Plasma 对 Wayland 的原生 RDP 实现，随桌面预装，无需额外服务。但先要接受它的三条限制：</p>
+<ul>
+<li>仅支持 NLA 认证</li>
+<li>无音频、无剪贴板共享</li>
+<li>登录界面 &#x2F; 锁屏状态下不可访问</li>
+</ul>
+<h2 id="二、方向一：Windows-→-Arch（krdp）"><a href="#二、方向一：Windows-→-Arch（krdp）" class="headerlink" title="二、方向一：Windows → Arch（krdp）"></a>二、方向一：Windows → Arch（krdp）</h2><h3 id="2-1-服务端配置"><a href="#2-1-服务端配置" class="headerlink" title="2.1 服务端配置"></a>2.1 服务端配置</h3><ol>
+<li>打开 <strong>System Settings → Remote Desktop</strong>（远程桌面 KCM）</li>
+<li>在 Server 区域选择要授权登录的用户（这里选了 <code>eliopan</code>）</li>
+<li>勾选 <strong>Start on login</strong>（autostart），保证开机后自动监听</li>
+<li>点击 Apply</li>
+</ol>
+<p>krdp 默认监听 <code>3389</code> 端口。证书为<strong>自签名</strong>，存放在 <code>~/.local/share/krdpserver/</code>（<code>krdp.crt</code> &#x2F; <code>krdp.key</code>），客户端首次连接会提示不受信任，需手动确认。</p>
+<h3 id="2-2-Bug-一：mstsc-无法连接（KDE-Bug-511557）"><a href="#2-2-Bug-一：mstsc-无法连接（KDE-Bug-511557）" class="headerlink" title="2.2 Bug 一：mstsc 无法连接（KDE Bug 511557）"></a>2.2 Bug 一：mstsc 无法连接（KDE Bug 511557）</h3><p>用 Windows 自带的 <strong>mstsc</strong> 连接，输入 IP 和凭据后，进度走到一半报 <strong>PostConnect failed</strong>，无法进入桌面。</p>
+<p>这是上游已知的兼容性问题（<a target="_blank" rel="noopener" href="https://bugs.kde.org/show_bug.cgi?id=511557">KDE Bug 511557</a>），<strong>至今未修复</strong>，本质是 mstsc 与 krdp 在连接握手阶段不兼容，与证书、密码无关。</p>
+<p><strong>解法</strong>：放弃 mstsc，改用基于 FreeRDP 的 <strong>Thincast Remote Desktop Client</strong> 作为 Windows 端客户端。新建连接时填 <code>&lt;ARCH_IP&gt;:3389</code>，勾选允许保存凭据。</p>
+<h3 id="2-3-Bug-二：PAM-认证失败，黑窗闪退（KDE-Bug-521776）"><a href="#2-3-Bug-二：PAM-认证失败，黑窗闪退（KDE-Bug-521776）" class="headerlink" title="2.3 Bug 二：PAM 认证失败，黑窗闪退（KDE Bug 521776）"></a>2.3 Bug 二：PAM 认证失败，黑窗闪退（KDE Bug 521776）</h3><p>Thincast 上第一次连接会弹出自签名证书警告，点继续后<strong>弹出一个黑框直接闪退</strong>，Arch 端也没有任何授权确认框，仿佛连接根本没到达认证阶段。</p>
+<p><strong>排查过程</strong>：</p>
+<ol>
+<li>先在 Arch 本地验证密码本身没问题：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - &lt;用户名&gt;</span><br></pre></td></tr></table></figure>
+密码输入正确，确认不是密码错误。</li>
+<li>查看 krdp 服务日志，发现关键报错：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">journalctl --user -u app-org.kde.krdpserver.service</span><br><span class="line"># pam_unix(login:auth): authentication failure</span><br></pre></td></tr></table></figure></li>
+<li>查看 systemd 服务文件，定位根因：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/lib/systemd/user/app-org.kde.krdpserver.service</span><br></pre></td></tr></table></figure>
+发现其中有 <code>NoNewPrivileges=true</code>。</li>
+</ol>
+<p><strong>根因</strong>是上游 <a target="_blank" rel="noopener" href="https://bugs.kde.org/show_bug.cgi?id=521776">KDE Bug 521776</a>：<code>NoNewPrivileges=true</code> 阻止了 <code>unix_chkpwd</code> 提权校验密码，导致 PAM 认证必然失败。上游在 6.7.2 已通过移除该设置修复，但 <strong>Arch 的 6.7.3 打包仍残留该设置</strong>，所以必须手动覆盖。</p>
+<p><strong>解法</strong>：写一个 systemd user 覆盖文件，强制把该设置关掉：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/.config/systemd/user/app-org.kde.krdpserver.service.d</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ~/.config/systemd/user/app-org.kde.krdpserver.service.d/override.conf</span></span><br><span class="line"><span class="section">[Service]</span></span><br><span class="line"><span class="attr">NoNewPrivileges</span>=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p>应用覆盖并重启服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user daemon-reload</span><br><span class="line">systemctl --user restart app-org.kde.krdpserver.service</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ 注意：<code>NoNewPrivileges=false</code> 属于「禁用安全缓解措施」，可能触发安全策略拦截（本机安装的 Claude Code 权限系统就拦过一次）。请理解这个操作的含义后再执行。</p>
+</blockquote>
+<p>重启后重新用 Thincast 连接，授权框正常弹出，认证通过，桌面成功显示。</p>
+<h3 id="2-4-附带坑：pam-faillock-账户锁定"><a href="#2-4-附带坑：pam-faillock-账户锁定" class="headerlink" title="2.4 附带坑：pam_faillock 账户锁定"></a>2.4 附带坑：pam_faillock 账户锁定</h3><p>排查过程中反复认证失败，累计触发了 <strong>pam_faillock</strong> 账户锁定：</p>
+<ul>
+<li>默认策略 <code>deny=3</code>、<code>unlock_time=600</code>（配置文件 <code>/etc/security/faillock.conf</code> 为空即用默认值）</li>
+<li>由于 <code>/etc/pam.d/system-auth</code> 的 preauth 段包含了 faillock，<strong>连 sudo 都一并被锁</strong>——表现为 sudo 输入正确密码也报认证失败</li>
+</ul>
+<p>处理方式：等约 600 秒自动解锁（可查看锁定剩余时间确认），解锁后清掉计数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> faillock --reset</span><br></pre></td></tr></table></figure>
+
+<p>这是排查期最容易忽视的连带问题，特此记录。</p>
+<h2 id="三、方向二：Arch-→-Windows（Windows-RDP-Host）"><a href="#三、方向二：Arch-→-Windows（Windows-RDP-Host）" class="headerlink" title="三、方向二：Arch → Windows（Windows RDP Host）"></a>三、方向二：Arch → Windows（Windows RDP Host）</h2><h3 id="3-1-Windows-端前置检查"><a href="#3-1-Windows-端前置检查" class="headerlink" title="3.1 Windows 端前置检查"></a>3.1 Windows 端前置检查</h3><p>RDP Host 需要 Windows <strong>Pro 及以上</strong>版本，先确认版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion&quot; /v EditionID</span><br><span class="line">:: 返回 ProfessionalWorkstation 即为 Pro 级，满足条件</span><br></pre></td></tr></table></figure>
+
+<p>其余关键检查项（管理员权限 cmd）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">:: 远程桌面未被策略禁用（0 表示允许）</span><br><span class="line">reg query &quot;HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server&quot; /v fDenyTSConnections</span><br><span class="line"></span><br><span class="line">:: 远程桌面服务是否在运行</span><br><span class="line">sc query TermService</span><br><span class="line"></span><br><span class="line">:: 是否有监听 3389</span><br><span class="line">netstat -an | findstr :3389</span><br><span class="line"></span><br><span class="line">:: 会话与监听器状态</span><br><span class="line">qwinsta</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-大坑：3389-无-LISTEN，重启才恢复"><a href="#3-2-大坑：3389-无-LISTEN，重启才恢复" class="headerlink" title="3.2 大坑：3389 无 LISTEN，重启才恢复"></a>3.2 大坑：3389 无 LISTEN，重启才恢复</h3><p>排查时遇到了一个非常迷惑的现象：</p>
+<ul>
+<li><code>sc query TermService</code> 显示服务 <strong>RUNNING</strong></li>
+<li><code>fDenyTSConnections</code> 注册表为 <code>0x0</code>，配置正常</li>
+<li>防火墙的远程桌面规则全部启用</li>
+<li>但 <code>netstat -an | findstr :3389</code> <strong>无任何返回</strong></li>
+<li><code>qwinsta</code> 也<strong>没有 RDP-Tcp 监听器</strong></li>
+<li>尝试 <code>net stop TermService</code> 被拒绝，无法重启服务</li>
+</ul>
+<p>结论：服务状态与配置长时间不同步，属于偶发问题。最终靠 <strong>Settings 里先关闭再开启远程桌面，然后重启 Windows</strong> 解决——重启后 <code>netstat</code> 正常出现 <code>LISTEN</code>，<code>qwinsta</code> 也能看到 RDP-Tcp。</p>
+<blockquote>
+<p>教训：遇到「服务显示正常但端口无监听」时，先不要盲目去改注册表和防火墙，<strong>先重启</strong>再谈排查。</p>
+</blockquote>
+<h3 id="3-3-KRDC-连接配置"><a href="#3-3-KRDC-连接配置" class="headerlink" title="3.3 KRDC 连接配置"></a>3.3 KRDC 连接配置</h3><p>Windows 端就绪后，用 KRDC 连接 <code>&lt;WIN_IP&gt;:3389</code>。连接对话框中有几个关键填写项：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>填什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>服务器 &#x2F; Host</td>
+<td><code>&lt;WIN_IP&gt;:3389</code></td>
+</tr>
+<tr>
+<td><strong>username</strong></td>
+<td><strong>用户账号名</strong>（不是电脑名称）</td>
+</tr>
+<tr>
+<td>domain</td>
+<td>留空</td>
+</tr>
+</tbody></table>
+<p><strong>username 到底填什么</strong>（这是最容易踩的）:</p>
+<ul>
+<li>电脑名称（主机名，如 <code>DESKTOP-XXXX</code>）是<strong>错的</strong>——那用于服务器地址，不是凭据</li>
+<li>填 Windows 的<strong>登录账号名</strong>；不确定时在 Windows 上执行：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">whoami</span><br><span class="line">:: 返回 DESKTOP-XXXX\用户名，取反斜杠后面那段</span><br></pre></td></tr></table></figure></li>
+<li>微软账户登录则填<strong>完整邮箱</strong>，domain 依旧留空</li>
+<li>若本地账户名与其他东西冲突，可在用户名前加 <code>.\</code>（如 <code>.\用户名</code>）强制指本机账户</li>
+</ul>
+<p>另外，连接过程中 KRDC 曾出现<strong>卡死无响应</strong>的情况，直接 <code>pkill -f krdc</code> 重开即可，也可用朴素参数（关闭音频、不共享媒体、避免全屏）降低客户端出问题的概率。</p>
+<h3 id="3-4-连接慢：Windows-反向-DNS-解析"><a href="#3-4-连接慢：Windows-反向-DNS-解析" class="headerlink" title="3.4 连接慢：Windows 反向 DNS 解析"></a>3.4 连接慢：Windows 反向 DNS 解析</h3><p>连接成功后观察到一个新问题：<code>netstat</code> 显示 Windows 的 3389 与本机端口已建立 TCP 连接（网络层是通的），但 <strong>KRDC 要等很久才进桌面</strong>。</p>
+<p>根因：<strong>Windows 的 RDP 服务器收到连接后，会对客户端 IP 做反向 DNS 解析</strong>。家用路由器没有给设备配置主机名解析，这次反向查询要一直等到超时（默认约 30 秒）才放弃，于是卡在进桌面之前。</p>
+<p><strong>解法</strong>：在 Windows 上以管理员身份编辑 hosts 文件，让反向解析秒查：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notepad C:\Windows\System32\drivers\etc\hosts</span><br></pre></td></tr></table></figure>
+
+<p>追加一行（把本机 Arch 的 IP 和主机名写进去）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;ARCH_IP&gt;    &lt;ARCH_HOST&gt;</span><br></pre></td></tr></table></figure>
+
+<p>保存后重新连接，立即进入桌面。</p>
+<h3 id="3-5-桌面布局与缩放不一致"><a href="#3-5-桌面布局与缩放不一致" class="headerlink" title="3.5 桌面布局与缩放不一致"></a>3.5 桌面布局与缩放不一致</h3><p>远程桌面显示的快捷方式摆放和缩放大小与 Windows 原机不同——这是 <strong>RDP 的固有行为</strong>：远程会话是全新会话，其<strong>分辨率由客户端决定</strong>，不是物理显示器。分辨率一变，Windows 就重新排布图标、重新计算 DPI 缩放。</p>
+<p><strong>解法</strong>：让远程会话尽量贴近原机：</p>
+<ul>
+<li>确认 Windows 物理显示器的<strong>原生分辨率</strong>（如 1920×1080）</li>
+<li>在 KRDC 连接设置里把 <strong>resolution</strong> 设为与该分辨率一致 ← 关键</li>
+<li><strong>desktop scale factor</strong> 保持 100%（不想放大就 100%）</li>
+<li><strong>device scale factor</strong> 保持 100%——它管的是本机（Arch）高分屏的适配，与「Windows 布局是否一致」无关；只有本地是 2K&#x2F;4K 且开了系统缩放时才需要动</li>
+</ul>
+<h3 id="3-6-RDP-会话隔离：物理桌面看不到"><a href="#3-6-RDP-会话隔离：物理桌面看不到" class="headerlink" title="3.6 RDP 会话隔离：物理桌面看不到"></a>3.6 RDP 会话隔离：物理桌面看不到</h3><p>连接后会发现：<strong>在 Windows 物理屏幕上刚打开的程序，远程会话里看不到</strong>。</p>
+<p>原因：RDP 是<strong>独立会话</strong>。你在物理屏幕（控制台会话）打开的东西，活在控制台会话里；RDP 连进去是另一个隔离的会话，两边桌面互不可见——你看到的是远程会话自己的桌面，不是物理屏幕的实时画面（且你连入时物理屏通常还会自动锁定）。</p>
+<p>这是 RDP 的固有机制，不是故障。如果目标是「直接看&#x2F;操作物理桌面上已经开着的东西」，两个方向：</p>
+<ul>
+<li>连接<strong>控制台会话</strong>：<code>mstsc /v:&lt;WIN_IP&gt; /admin</code>，Linux 端可用 <code>xfreerdp</code> 加 <code>/admin</code> 参数</li>
+<li>改用 <strong>RustDesk</strong> 这类「屏幕控制」工具，它才是真正接管物理桌面</li>
+</ul>
+<h2 id="四、踩坑清单速查"><a href="#四、踩坑清单速查" class="headerlink" title="四、踩坑清单速查"></a>四、踩坑清单速查</h2><table>
+<thead>
+<tr>
+<th>#</th>
+<th>现象</th>
+<th>根因</th>
+<th>解法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>mstsc 报 PostConnect failed</td>
+<td>KDE Bug 511557（未修复）</td>
+<td>改用 Thincast 客户端</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Thincast 黑窗闪退、无授权框</td>
+<td>KDE Bug 521776：<code>NoNewPrivileges=true</code> 破坏 PAM</td>
+<td>systemd user override 置 false</td>
+</tr>
+<tr>
+<td>3</td>
+<td>多次失败后 sudo 被锁</td>
+<td>pam_faillock（deny&#x3D;3, unlock 600s）</td>
+<td>等解锁 + <code>sudo faillock --reset</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Windows 3389 无 LISTEN</td>
+<td>TermService 状态与配置不同步</td>
+<td>关闭重开远程桌面 + 重启 Windows</td>
+</tr>
+<tr>
+<td>5</td>
+<td>RDP 连接等 30s+</td>
+<td>Windows 反向 DNS 解析超时</td>
+<td>Windows hosts 加本机主机名</td>
+</tr>
+<tr>
+<td>6</td>
+<td>远程桌面布局&#x2F;缩放不同</td>
+<td>RDP 新会话、分辨率由客户端决定</td>
+<td>resolution 设为物理显示器原生值</td>
+</tr>
+<tr>
+<td>7</td>
+<td>物理桌面的程序看不到</td>
+<td>RDP 会话隔离</td>
+<td><code>/admin</code> 控制台会话，或 RustDesk</td>
+</tr>
+</tbody></table>
+<h2 id="五、最终形态"><a href="#五、最终形态" class="headerlink" title="五、最终形态"></a>五、最终形态</h2><ul>
+<li><strong>Windows → Arch</strong>：Thincast 客户端 + krdp（含 <code>NoNewPrivileges</code> 覆盖），连接成功，授权框正常</li>
+<li><strong>Arch → Windows</strong>：KRDC + Windows RDP Host（重启后正常监听 3389），连接成功，秒进桌面</li>
+<li>两个方向均验证可用</li>
+</ul>
+<blockquote>
+<p>本次仅覆盖局域网场景。跨网络（非局域网）场景属于另一套方案（Tailscale &#x2F; 自托管 RustDesk），不在本文范围内。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://pdd4real.github.io/2026/08/05/arch-windows-remote-desktop/" data-id="cuidL-fibF4nHBuNLKha172fn" data-title="Arch Linux × Windows 跨设备远程桌面搭建全记录" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Arch-Linux/" rel="tag">Arch Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/KDE/" rel="tag">KDE</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RDP/" rel="tag">RDP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Wayland/" rel="tag">Wayland</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/" rel="tag">远程桌面</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/08/05/%E4%BD%A0%E5%A5%BD%EF%BC%8C%E4%B8%96%E7%95%8C/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">你好，世界</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8A%98%E8%85%BE%E8%AE%B0%E5%BD%95/">折腾记录</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Arch-Linux/" rel="tag">Arch Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/" rel="tag">KDE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RDP/" rel="tag">RDP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wayland/" rel="tag">Wayland</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/" rel="tag">Windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/" rel="tag">远程桌面</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Arch-Linux/" style="font-size: 10px;">Arch Linux</a> <a href="/tags/KDE/" style="font-size: 10px;">KDE</a> <a href="/tags/RDP/" style="font-size: 10px;">RDP</a> <a href="/tags/Wayland/" style="font-size: 10px;">Wayland</a> <a href="/tags/Windows/" style="font-size: 10px;">Windows</a> <a href="/tags/%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/" style="font-size: 10px;">远程桌面</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/08/">八月 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/08/05/arch-windows-remote-desktop/">Arch Linux × Windows 跨设备远程桌面搭建全记录</a>
+          </li>
+        
+          <li>
+            <a href="/2026/08/05/%E4%BD%A0%E5%A5%BD%EF%BC%8C%E4%B8%96%E7%95%8C/">你好，世界</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 pdd4real<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
