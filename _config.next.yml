@@ -47,11 +47,6 @@ social_icons:
   icons_only: false
   transition: true
 
-# 浅蓝色主题配色（只覆盖颜色，不改变布局）
-theme_color:
-  light: '#1F6F9F'
-  dark: '#123B5A'
-
 custom_file_path:
   style: source/_data/styles.styl
 
