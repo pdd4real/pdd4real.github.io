@@ -1,6 +1,7 @@
 ---
 title: Arch Linux × Windows 跨设备远程桌面搭建全记录
 date: 2026-08-05 21:50:00
+updated: 2026-08-05 22:20:00
 categories:
   - 折腾记录
 tags:
@@ -10,6 +11,7 @@ tags:
   - RDP
   - KDE
   - Wayland
+  - Tailscale
 ---
 
 # Arch Linux × Windows 跨设备远程桌面搭建全记录
@@ -241,4 +243,84 @@ notepad C:\Windows\System32\drivers\etc\hosts
 - **Arch → Windows**：KRDC + Windows RDP Host（重启后正常监听 3389），连接成功，秒进桌面
 - 两个方向均验证可用
 
-> 本次仅覆盖局域网场景。跨网络（非局域网）场景属于另一套方案（Tailscale / 自托管 RustDesk），不在本文范围内。
+## 六、跨网络方案：Tailscale
+
+上面的方案只能在家用，出门就没法连了——因为 Windows 在路由器 NAT 后面，公网摸不到它的 3389。这里用 Tailscale 打通跨网络 RDP。
+
+### 6.1 Tailscale 是什么
+
+Tailscale 基于 WireGuard 建立加密隧道，给每台加入的设备分配一个虚拟内网 IP（`100.x.x.x`），所有设备之间通过这个虚拟 IP 直接通信，底层是 WireGuard 点对点加密，无需暴露任何公网端口。免费方案支持 100 台设备，对个人使用完全够用。
+
+KRDC 用 Tailscale IP 连 RDP 的逻辑跟局域网完全一致——客户端根本不关心你给的是物理 IP 还是虚拟 IP，只要网络层通就行。
+
+### 6.2 Arch 端安装与配置
+
+安装：
+
+```bash
+sudo pacman -S tailscale
+```
+
+启动服务并设为开机自启：
+
+```bash
+sudo systemctl enable --now tailscaled
+```
+
+登录认证（会输出一个链接，浏览器打开，用 Google / GitHub / Microsoft 账号登录）：
+
+```bash
+tailscale up
+```
+
+认证完成后验证：
+
+```bash
+tailscale status
+```
+
+输出示例（IP 脱敏）：
+
+```
+100.x.y.z  archlinux  user@  linux   -
+```
+
+对应设备拿到的就是 `100.x.y.z` 这个虚拟 IP。
+
+### 6.3 Windows 端安装与配置
+
+1. 打开 https://tailscale.com/download/windows ，下载安装
+2. 用**同一个账号**登录
+3. 安装完成弹出 "open local settings / open admin console / close" 时，直接选 **close**
+
+回到 Arch 端再次执行 `tailscale status`，确认两台设备都在网络内：
+
+```
+100.x.y.z  archlinux  user@  linux    -
+100.a.b.c  pdd        user@  windows  -
+```
+
+### 6.4 用 KRDC 跨网络连接
+
+现在 KRDC 的「服务器地址」不再填局域网 IP，改成填 Windows 的 Tailscale IP：
+
+| 字段 | 值 |
+|---|---|
+| 服务器 / Host | `100.a.b.c:3389`（Windows 在 `tailscale status` 里显示的 IP） |
+| username | 同局域网配置（Windows 登录账号名） |
+| domain | 留空 |
+
+其余配置完全不变。无论是在家、在公司、在星巴克，只要两台设备都有网，KRDC 就能连上。
+
+### 6.5 原理简述
+
+```
+┌──────────┐          Tailscale 隧道          ┌──────────┐
+│   KRDC   │ ──── 100.x.y.z ═══════ 100.a.b.c ──── │  Windows  │
+│  (Arch)  │  TCP 3389 走加密的 WireGuard 链路    │  RDP Host │
+└──────────┘                                    └──────────┘
+```
+
+KRDC 不需要任何特殊配置——它只知道要连 `100.a.b.c:3389` 这个 RDP 端点，至于数据包怎么过去的是 Tailscale 的事。底层的 WireGuard 隧道保证了跨公网也能端到端加密通信，同时不用在路由器上开放任何端口。
+
+> 本文覆盖局域网（一至五节）与跨网络（第六节）两个场景。自托管 RustDesk 是另一种备选方案，需要额外维护一台中继服务器，在本文不展开。
