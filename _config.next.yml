@@ -49,8 +49,8 @@ social_icons:
 
 # 浅蓝色主题配色（只覆盖颜色，不改变布局）
 theme_color:
-  light: '#3E7CB1'
-  dark: '#244E70'
+  light: '#1F6F9F'
+  dark: '#123B5A'
 
 custom_file_path:
   style: source/_data/styles.styl
