@@ -142,19 +142,19 @@ class GCNLayer(nn.Module):
 
 那么，这个图的带有自环的邻接矩阵 $\tilde{A}$ 如下（有连接就是 1，没连接就是 0）：
 
-$$\tilde{A} = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix}$$
+$$\tilde{A} = \left[\begin{array}{ccc} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{array}\right]$$
 
 *(注：第一行代表节点 1 连接了 1, 2, 3；第二行代表节点 2 连接了 1, 2；第三行代表节点 3 连接了 1, 3)*
 
 假设每个节点有 2 个特征，特征矩阵 $H$ 如下：
 
-$$H = \begin{bmatrix} h_{11} & h_{12} \\ h_{21} & h_{22} \\ h_{31} & h_{32} \end{bmatrix}$$
+$$H = \left[\begin{array}{cc} h_{11} & h_{12} \\ h_{21} & h_{22} \\ h_{31} & h_{32} \end{array}\right]$$
 
 *(注：第一行是节点 1 的特征向量，第二行是节点 2 的，以此类推)*
 
 现在，我们执行矩阵乘法 $\tilde{A} \times H$：
 
-$$\tilde{A}H = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix} \begin{bmatrix} h_{11} & h_{12} \\ h_{21} & h_{22} \\ h_{31} & h_{32} \end{bmatrix} = \begin{bmatrix} 1\cdot h_{11} + 1\cdot h_{21} + 1\cdot h_{31} & 1\cdot h_{12} + 1\cdot h_{22} + 1\cdot h_{32} \\ 1\cdot h_{11} + 1\cdot h_{21} + 0\cdot h_{31} & 1\cdot h_{12} + 1\cdot h_{22} + 0\cdot h_{32} \\ 1\cdot h_{11} + 0\cdot h_{21} + 1\cdot h_{31} & 1\cdot h_{12} + 0\cdot h_{22} + 1\cdot h_{32} \end{bmatrix}$$
+$$\tilde{A}H = \left[\begin{array}{ccc} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{array}\right] \left[\begin{array}{cc} h_{11} & h_{12} \\ h_{21} & h_{22} \\ h_{31} & h_{32} \end{array}\right] = \left[\begin{array}{cc} 1\cdot h_{11} + 1\cdot h_{21} + 1\cdot h_{31} & 1\cdot h_{12} + 1\cdot h_{22} + 1\cdot h_{32} \\ 1\cdot h_{11} + 1\cdot h_{21} + 0\cdot h_{31} & 1\cdot h_{12} + 1\cdot h_{22} + 0\cdot h_{32} \\ 1\cdot h_{11} + 0\cdot h_{21} + 1\cdot h_{31} & 1\cdot h_{12} + 0\cdot h_{22} + 1\cdot h_{32} \end{array}\right]$$
 
 **观察结果矩阵的每一行：**
 
@@ -175,7 +175,7 @@ $$\tilde{A}H = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix}
 
 在矩阵代数中，**对角矩阵的逆矩阵 $\tilde{D}^{-1}$，就是将其对角线上的元素取倒数**：
 
-$$\tilde{D}^{-1} = \begin{bmatrix} \frac{1}{d_1} & 0 & 0 \\ 0 & \frac{1}{d_2} & 0 \\ 0 & 0 & \frac{1}{d_3} \end{bmatrix}$$
+$$\tilde{D}^{-1} = \left[\begin{array}{ccc} \frac{1}{d_1} & 0 & 0 \\ 0 & \frac{1}{d_2} & 0 \\ 0 & 0 & \frac{1}{d_3} \end{array}\right]$$
 
 如果我们计算 $\tilde{D}^{-1} (\tilde{A}H)$：
 
@@ -191,7 +191,7 @@ $$\tilde{D}^{-1} = \begin{bmatrix} \frac{1}{d_1} & 0 & 0 \\ 0 & \frac{1}{d_2} & 
 
 所以，$\tilde{D}^{-\frac{1}{2}}$ 就是把对角线上的“度数”先开根号，再取倒数：
 
-$$\tilde{D}^{-\frac{1}{2}} = \begin{bmatrix} \frac{1}{\sqrt{d_1}} & 0 & 0 \\ 0 & \frac{1}{\sqrt{d_2}} & 0 \\ 0 & 0 & \frac{1}{\sqrt{d_3}} \end{bmatrix}$$
+$$\tilde{D}^{-\frac{1}{2}} = \left[\begin{array}{ccc} \frac{1}{\sqrt{d_1}} & 0 & 0 \\ 0 & \frac{1}{\sqrt{d_2}} & 0 \\ 0 & 0 & \frac{1}{\sqrt{d_3}} \end{array}\right]$$
 
 #### C. 什么是对称归一化 ($\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$)？
 

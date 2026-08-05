@@ -23,19 +23,16 @@ tags:
 
 ### 不同的正则化
 
-$\text{Def. 1}$
-$$
-\begin{array}{c}\text{if}\ x=[x_1,...,x_n]^\top \\
-\text{then the p-norm of vector x is} \ ||x||_p=(\sum_{i=1}^{n}|x|^p)^{\frac{1}{p}}
-\end{array}
-$$
-$\text{Exp. 1}$
-$$
-\text{L}_0\text{-norm is the number of non-zero elements.} \\
-\text{L}_1\text{-norm}=\sum_{i=1}^n{|x|}\\
-\text{L}_2\text{-norm}=\sqrt{\sum_{i=1}^n{|x|^2}}\\
-\text{where }|\cdot|\text{ is the absolute value of } \cdot
-$$
+$$\begin{array}{l}
+&\text{Def. 1: if } x=[x_1,\ldots,x_n]^\top,\\
+&\text{then } ||x||_p=\left(\sum_{i=1}^{n}|x_i|^p\right)^{\frac{1}{p}}.
+\end{array}$$
+
+$$\begin{array}{l}
+&\text{Exp. 1: } L_0\text{-norm is the number of non-zero elements},\\
+&L_1\text{-norm}=\sum_{i=1}^n|x_i|,\\
+&L_2\text{-norm}=\sqrt{\sum_{i=1}^n|x_i|^2}.
+\end{array}$$
 
 - 一般来说，supervised learning的objective function可以看作是$\text{Loss}(y_i,f(x_i,\theta))+\text{norm regularizer/penalty term}$
 
@@ -134,7 +131,7 @@ $$||A||_F^2 = Tr(A^\top A)$$
 
 假设我们有一个 $2 \times 2$ 的简单矩阵 $A$：
 
-$$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$$
+$$A = \left[\begin{array}{cc} 1 & 2 \\ 3 & 4 \end{array}\right]$$
 
 **计算 1：按 Frobenius 范数平方定义计算**
 
@@ -146,11 +143,11 @@ $$||A||_F^2 = 1^2 + 2^2 + 3^2 + 4^2 = 1 + 4 + 9 + 16 = 30$$
 
 第一步，写出 $A$ 的转置矩阵 $A^\top$：
 
-$$A^\top = \begin{pmatrix} 1 & 3 \\ 2 & 4 \end{pmatrix}$$
+$$A^\top = \left[\begin{array}{cc} 1 & 3 \\ 2 & 4 \end{array}\right]$$
 
 第二步，计算矩阵乘积 $A^\top A$：
 
-$$A^\top A = \begin{pmatrix} 1 & 3 \\ 2 & 4 \end{pmatrix} \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} = \begin{pmatrix} (1\times1 + 3\times3) & (1\times2 + 3\times4) \\ (2\times1 + 4\times3) & (2\times2 + 4\times4) \end{pmatrix} = \begin{pmatrix} 10 & 14 \\ 14 & 20 \end{pmatrix}$$
+$$A^\top A = \left[\begin{array}{cc} 1 & 3 \\ 2 & 4 \end{array}\right] \left[\begin{array}{cc} 1 & 2 \\ 3 & 4 \end{array}\right] = \left[\begin{array}{cc} (1\times1 + 3\times3) & (1\times2 + 3\times4) \\ (2\times1 + 4\times3) & (2\times2 + 4\times4) \end{array}\right] = \left[\begin{array}{cc} 10 & 14 \\ 14 & 20 \end{array}\right]$$
 
 第三步，计算所得矩阵的主对角线元素之和（即迹）：
 

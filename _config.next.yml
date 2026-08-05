@@ -47,6 +47,14 @@ social_icons:
   icons_only: false
   transition: true
 
+# 浅蓝色主题配色（只覆盖颜色，不改变布局）
+theme_color:
+  light: '#6FA9D8'
+  dark: '#355D7A'
+
+custom_file_path:
+  style: source/_data/styles.styl
+
 # 数学公式：由 hexo-filter-mathjax 转换为 MathJax 可渲染的 HTML
 math:
   every_page: false
