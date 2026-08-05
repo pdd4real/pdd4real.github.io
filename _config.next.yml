@@ -47,6 +47,13 @@ social_icons:
   icons_only: false
   transition: true
 
+toc:
+  enable: true
+  number: false
+  wrap: false
+  expand_all: false
+  max_depth: 6
+
 custom_file_path:
   style: source/_data/styles.styl
 

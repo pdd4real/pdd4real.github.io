@@ -13,24 +13,24 @@ tags:
   - RegMean
 ---
 
-# L1/L2 正则化、Frobenius 范数与 RegMean
-
 本文整理 L1、L2 正则化的基本概念，并补充 Frobenius 范数与矩阵迹的关系，以及 RegMean 正则项和传统 L2 正则化之间的区别。
 
 <!-- more -->
 
 
 
+## L1/L2 正则化
+
 ### 不同的正则化
 
 $$\begin{array}{l}
-&\text{Def. 1: if } x=[x\_1,\ldots,x\_n]^\top,\\
+&\text{Def. 1: if } x=[x\_1,\ldots,x\_n]^\top,\\\\
 &\text{then } ||x||\_p=\left(\sum\_{i=1}^{n}|x\_i|^p\right)^{\frac{1}{p}}.
 \end{array}$$
 
 $$\begin{array}{l}
-&\text{Exp. 1: } L\_0\text{-norm is the number of non-zero elements},\\
-&L\_1\text{-norm}=\sum\_{i=1}^n|x\_i|,\\
+&\text{Exp. 1: } L\_0\text{-norm is the number of non-zero elements},\\\\
+&L\_1\text{-norm}=\sum\_{i=1}^n|x\_i|,\\\\
 &L\_2\text{-norm}=\sqrt{\sum\_{i=1}^n|x\_i|^2}.
 \end{array}$$
 
@@ -52,7 +52,7 @@ $$\begin{array}{l}
 
 $\text{Exp. 2}$
 $$
-\text{for 2-dimension/2 parameters case } w\_1 ,w\_2\text{, L}\_1\text{-norm is }\\ ||w||\_1=|w\_1|+|w\_2|\\
+\text{for 2-dimension/2 parameters case } w\_1 ,w\_2\text{, L}\_1\text{-norm is }\\\\ ||w||\_1=|w\_1|+|w\_2|\\\\
 \text{L}\_1\text{-Ball is defined as }|w\_1|+|w\_2|\leq C
 $$
 
@@ -75,19 +75,21 @@ $$
 
 $\text{Def. 2}$
 $$
-\text{for a matrix }A\in \mathbb{R}^{m\times n},\text{use SVD then we can get }\\
-A=U\Sigma V^\top \\
-\Sigma \text{ represents scaling in features where singular value is non-zero.}\\
+\text{for a matrix }A\in \mathbb{R}^{m\times n},\text{use SVD then we can get }\\\\
+A=U\Sigma V^\top \\\\
+\Sigma \text{ represents scaling in features where singular value is non-zero.}\\\\
 \text{The condition number of A is define as }\frac{SV\_{\max}}{SV\_{\min}}  
 $$
 如果条件数很大（**病态矩阵**），那么对于输入x的微小变化，输出Ax在奇异值大的方向的scaling就会远大于奇异值小的方向的scaling。
 $$
-\text{Suppose we have N samples, each having D features.(To include bias b, set D+1 features.)} \\
-\text{for objective function }l=\frac{1}{N}||XW-Y||^2,\text{where }X \in \mathbb{R}^{N\times (D+1)},Y\in \mathbb{R}^{N\times 1},W\in \mathbb{R}^{(D+1)\times 1} \\
+\text{Suppose we have N samples, each having D features.(To include bias b, set D+1 features.)} \\\\
+\text{for objective function }l=\frac{1}{N}||XW-Y||^2,\text{where }X \in \mathbb{R}^{N\times (D+1)},Y\in \mathbb{R}^{N\times 1},W\in \mathbb{R}^{(D+1)\times 1} \\\\
 $$
 可以得到闭式解$\hat{W} = (X^T X)^{-1} X^T y$，加了L2正则项之后，我们的解析解变为$\hat{W} = (X^T X + \lambda I)^{-1} X^T y$。也就是给$X X^\top$中的所有奇异值加上一个 $\lambda$，可以确保奇异值不会太小，而导致再求逆后，奇异值变的极大。这样有效的解决了病态矩阵的问题。过拟合的实质可以看作由于病态矩阵的存在，如果y有一点波动，整个模型需要大幅度调整。解决了病态矩阵问题，就解决了过拟合。
 
 ------
+
+## Frobenius 范数与矩阵迹
 
 在数学和线性代数中，Frobenius 范数的平方与矩阵内积的迹等价是一个非常经典的恒等式。论文的附录 A.4 中也明确指出了这一点：“我们通过其迹恒等式来计算 Frobenius 范数，即 $||\Delta W\_t||\_F^2 = Tr(\Delta W\_t^\top \Delta W\_t)$” 。
 
@@ -131,7 +133,7 @@ $$||A||\_F^2 = Tr(A^\top A)$$
 
 假设我们有一个 $2 \times 2$ 的简单矩阵 $A$：
 
-$$A = \left[\begin{array}{cc} 1 & 2 \\ 3 & 4 \end{array}\right]$$
+$$A = \left[\begin{array}{cc} 1 & 2 \\\\ 3 & 4 \end{array}\right]$$
 
 **计算 1：按 Frobenius 范数平方定义计算**
 
@@ -143,11 +145,11 @@ $$||A||\_F^2 = 1^2 + 2^2 + 3^2 + 4^2 = 1 + 4 + 9 + 16 = 30$$
 
 第一步，写出 $A$ 的转置矩阵 $A^\top$：
 
-$$A^\top = \left[\begin{array}{cc} 1 & 3 \\ 2 & 4 \end{array}\right]$$
+$$A^\top = \left[\begin{array}{cc} 1 & 3 \\\\ 2 & 4 \end{array}\right]$$
 
 第二步，计算矩阵乘积 $A^\top A$：
 
-$$A^\top A = \left[\begin{array}{cc} 1 & 3 \\ 2 & 4 \end{array}\right] \left[\begin{array}{cc} 1 & 2 \\ 3 & 4 \end{array}\right] = \left[\begin{array}{cc} (1\times1 + 3\times3) & (1\times2 + 3\times4) \\ (2\times1 + 4\times3) & (2\times2 + 4\times4) \end{array}\right] = \left[\begin{array}{cc} 10 & 14 \\ 14 & 20 \end{array}\right]$$
+$$A^\top A = \left[\begin{array}{cc} 1 & 3 \\\\ 2 & 4 \end{array}\right] \left[\begin{array}{cc} 1 & 2 \\\\ 3 & 4 \end{array}\right] = \left[\begin{array}{cc} (1\times1 + 3\times3) & (1\times2 + 3\times4) \\\\ (2\times1 + 4\times3) & (2\times2 + 4\times4) \end{array}\right] = \left[\begin{array}{cc} 10 & 14 \\\\ 14 & 20 \end{array}\right]$$
 
 第三步，计算所得矩阵的主对角线元素之和（即迹）：
 
@@ -156,6 +158,8 @@ $$Tr(A^\top A) = 10 + 20 = 30$$
 **验证结果：** 通过两种方法计算得出的结果都是 **30**，完美验证了 $||\Delta W\_t||\_F^2 \equiv Tr(\Delta W\_t^\top \Delta W\_t)$ 这一数学恒等式 。在代码实现中，计算矩阵对角线之和通常比手动遍历所有元素平方和更容易调用现成的线性代数库函数进行并行加速。
 
 ------
+
+## RegMean 与 L2 正则化
 
 RegMean 损失函数中的正则化项本质上是对权重偏离度的惩罚，但它与传统的 $L2$ 正则化在**惩罚力度的分配机制**上有根本区别。
 
@@ -218,4 +222,3 @@ $$\Lambda\_{i}^{(l)} = \frac{1-\alpha}{\alpha} diag((X\_{i}^{(l)})^{\top}X\_{i}^
 ### 总结
 
 可以将 $L2$ 正则化看作是“一刀切”的橡皮筋，无论哪个方向拉伸，回弹力都一样；而 RegMean 的正则化项是一张“智能弹簧网”，它的各个节点的弹力大小是由**候选模型的训练数据特征**决定的，重要特征对应的弹力极强，次要特征对应的弹力较弱 。
-

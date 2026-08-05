@@ -6,6 +6,16 @@
   border-radius: 14px !important
   overflow: hidden
 
+// Keep display equations at their natural width and scroll when necessary.
+.post-body mjx-container[display='true']
+  max-width: 100%
+  overflow-x: auto
+  overflow-y: hidden
+  padding: 4px 0
+
+.post-body mjx-container[display='true'] > svg
+  max-width: none
+
 // Rounded panels
 header.header,
 .main-inner .post-block,

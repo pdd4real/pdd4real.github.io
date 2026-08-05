@@ -12,8 +12,6 @@ tags:
   - pkg-config
 ---
 
-# Fish Shell 下编译 SDL2 的 undefined reference 问题
-
 C/C++ 编译过程分为编译（Compile）和链接（Link）两个独立阶段。本文从一次 SDL2 链接报错出发，梳理 `pkg-config`、GCC 参数以及 Fish Shell 命令替换之间的关系。
 
 <!-- more -->

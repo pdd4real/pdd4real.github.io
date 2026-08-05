@@ -15,8 +15,6 @@ tags:
   - Tailscale
 ---
 
-# Arch Linux × Windows 跨设备远程桌面搭建全记录
-
 > 记录一次完整的「Arch Linux (KDE Plasma 6.7.3, Wayland) ↔ Windows 11」双向远程桌面搭建过程：从方案选型、双向配置，到踩过的两个 KDE 上游 bug、若干 Windows 侧坑位，以及最终的连接调优。文中 IP 均已脱敏，实际使用请替换为你的真实地址。
 
 <!-- more -->

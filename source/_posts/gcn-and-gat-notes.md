@@ -13,11 +13,11 @@ tags:
   - PyTorch
 ---
 
-# 从 GCN 到 GAT：公式、直觉与代码笔记
-
 图神经网络（GNN）需要把规则网格数据上的深度学习方法迁移到不规则的拓扑数据上。图卷积网络（GCN）是这一领域的基础，也是理解图学习中消息传递思想的一个合适起点。
 
 <!-- more -->
+
+## GCN
 
 下面从公式、直觉、代码和模型对比四个方面整理 Kipf 和 Welling 在 2017 年提出的经典 GCN 模型。
 
@@ -132,6 +132,8 @@ class GCNLayer(nn.Module):
 
 ------
 
+## GCN 公式的矩阵直觉
+
 ### 1. 为什么 $\tilde{A}H$ 这一乘法等于“收集并相加邻居的特征”？
 
 要理解这一点，我们直接拿一个极简的例子来模拟矩阵乘法。
@@ -142,19 +144,19 @@ class GCNLayer(nn.Module):
 
 那么，这个图的带有自环的邻接矩阵 $\tilde{A}$ 如下（有连接就是 1，没连接就是 0）：
 
-$$\tilde{A} = \left[\begin{array}{ccc} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{array}\right]$$
+$$\tilde{A} = \left[\begin{array}{ccc} 1 & 1 & 1 \\\\ 1 & 1 & 0 \\\\ 1 & 0 & 1 \end{array}\right]$$
 
 *(注：第一行代表节点 1 连接了 1, 2, 3；第二行代表节点 2 连接了 1, 2；第三行代表节点 3 连接了 1, 3)*
 
 假设每个节点有 2 个特征，特征矩阵 $H$ 如下：
 
-$$H = \left[\begin{array}{cc} h\_{11} & h\_{12} \\ h\_{21} & h\_{22} \\ h\_{31} & h\_{32} \end{array}\right]$$
+$$H = \left[\begin{array}{cc} h\_{11} & h\_{12} \\\\ h\_{21} & h\_{22} \\\\ h\_{31} & h\_{32} \end{array}\right]$$
 
 *(注：第一行是节点 1 的特征向量，第二行是节点 2 的，以此类推)*
 
 现在，我们执行矩阵乘法 $\tilde{A} \times H$：
 
-$$\tilde{A}H = \left[\begin{array}{ccc} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end{array}\right] \left[\begin{array}{cc} h\_{11} & h\_{12} \\ h\_{21} & h\_{22} \\ h\_{31} & h\_{32} \end{array}\right] = \left[\begin{array}{cc} 1\cdot h\_{11} + 1\cdot h\_{21} + 1\cdot h\_{31} & 1\cdot h\_{12} + 1\cdot h\_{22} + 1\cdot h\_{32} \\ 1\cdot h\_{11} + 1\cdot h\_{21} + 0\cdot h\_{31} & 1\cdot h\_{12} + 1\cdot h\_{22} + 0\cdot h\_{32} \\ 1\cdot h\_{11} + 0\cdot h\_{21} + 1\cdot h\_{31} & 1\cdot h\_{12} + 0\cdot h\_{22} + 1\cdot h\_{32} \end{array}\right]$$
+$$\tilde{A}H = \left[\begin{array}{ccc} 1 & 1 & 1 \\\\ 1 & 1 & 0 \\\\ 1 & 0 & 1 \end{array}\right] \left[\begin{array}{cc} h\_{11} & h\_{12} \\\\ h\_{21} & h\_{22} \\\\ h\_{31} & h\_{32} \end{array}\right] = \left[\begin{array}{cc} 1\cdot h\_{11} + 1\cdot h\_{21} + 1\cdot h\_{31} & 1\cdot h\_{12} + 1\cdot h\_{22} + 1\cdot h\_{32} \\\\ 1\cdot h\_{11} + 1\cdot h\_{21} + 0\cdot h\_{31} & 1\cdot h\_{12} + 1\cdot h\_{22} + 0\cdot h\_{32} \\\\ 1\cdot h\_{11} + 0\cdot h\_{21} + 1\cdot h\_{31} & 1\cdot h\_{12} + 0\cdot h\_{22} + 1\cdot h\_{32} \end{array}\right]$$
 
 **观察结果矩阵的每一行：**
 
@@ -175,7 +177,7 @@ $$\tilde{A}H = \left[\begin{array}{ccc} 1 & 1 & 1 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \end
 
 在矩阵代数中，**对角矩阵的逆矩阵 $\tilde{D}^{-1}$，就是将其对角线上的元素取倒数**：
 
-$$\tilde{D}^{-1} = \left[\begin{array}{ccc} \frac{1}{d\_1} & 0 & 0 \\ 0 & \frac{1}{d\_2} & 0 \\ 0 & 0 & \frac{1}{d\_3} \end{array}\right]$$
+$$\tilde{D}^{-1} = \left[\begin{array}{ccc} \frac{1}{d\_1} & 0 & 0 \\\\ 0 & \frac{1}{d\_2} & 0 \\\\ 0 & 0 & \frac{1}{d\_3} \end{array}\right]$$
 
 如果我们计算 $\tilde{D}^{-1} (\tilde{A}H)$：
 
@@ -191,7 +193,7 @@ $$\tilde{D}^{-1} = \left[\begin{array}{ccc} \frac{1}{d\_1} & 0 & 0 \\ 0 & \frac{
 
 所以，$\tilde{D}^{-\frac{1}{2}}$ 就是把对角线上的“度数”先开根号，再取倒数：
 
-$$\tilde{D}^{-\frac{1}{2}} = \left[\begin{array}{ccc} \frac{1}{\sqrt{d\_1}} & 0 & 0 \\ 0 & \frac{1}{\sqrt{d\_2}} & 0 \\ 0 & 0 & \frac{1}{\sqrt{d\_3}} \end{array}\right]$$
+$$\tilde{D}^{-\frac{1}{2}} = \left[\begin{array}{ccc} \frac{1}{\sqrt{d\_1}} & 0 & 0 \\\\ 0 & \frac{1}{\sqrt{d\_2}} & 0 \\\\ 0 & 0 & \frac{1}{\sqrt{d\_3}} \end{array}\right]$$
 
 #### C. 什么是对称归一化 ($\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}$)？
 
@@ -211,6 +213,8 @@ $$\frac{1}{\sqrt{d\_i} \cdot \sqrt{d\_j}}$$
 ------
 
 这就是 GCN 公式中看似枯燥的矩阵运算背后隐藏的图拓扑逻辑。
+
+## GAT
 
 在理解了 GCN 通过对称归一化（$\frac{1}{\sqrt{d\_i d\_j}}$）来固定分配邻居权重的机制后，图注意力网络（Graph Attention Networks, GAT）的出现就显得顺理成章了。GAT 解决的是 GCN 的一个核心痛点：**GCN 认为图中节点之间的连接权重仅仅取决于它们的度数（拓扑结构），而 GAT 认为权重应该由节点自身的特征内容动态决定。**
 
@@ -340,4 +344,3 @@ GAT 和自然语言处理中 Transformer 所使用的自注意力机制（Self-A
 | **打分机制的设计**        | 通常采用 **Scaled Dot-Product Attention**，通过定义三组不同的权重 $W\_Q, W\_K, W\_V$（Query, Key, Value），利用点积计算相似度。 | 原始论文采用 **Additive Attention（加性注意力）**。使用同一组共享权重 $W$，将特征拼接后通过向量 $\vec{a}$ 和非线性激活函数映射为标量得分。 |
 
 Transformer 里的 Attention 通过让所有数据互相计算注意力来学习潜在结构；GAT 则直接利用已有的图结构（边）作为掩码，在这个约束下计算局部注意力权重。
-
