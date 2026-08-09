@@ -137,7 +137,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -148,7 +148,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -170,6 +170,210 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://pdd4real.github.io/2026/08/10/arch-neovim-markdown-preview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="pdd4real">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pan's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Pan's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/08/10/arch-neovim-markdown-preview/" class="post-title-link" itemprop="url">Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-08-10 01:20:00" itemprop="dateCreated datePublished" datetime="2026-08-10T01:20:00+08:00">2026-08-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录"><a href="#Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录" class="headerlink" title="Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录"></a>Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</h1><blockquote>
+<p>记录一次在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览（markdown-preview.nvim）的完整过程：与本地 Vim 的共存检查、配置落盘，以及四个连环踩坑——从 vim-plug 找不到、Ctrl+S 被终端吞掉、F5 被桌面抢走，到最终那个最隐蔽的「按键静默失败」：预览服务端缺 node_modules。重点沉淀了 headless 模式下的诊断方法论。</p>
+</blockquote>
+<h2 id="背景与目标"><a href="#背景与目标" class="headerlink" title="背景与目标"></a>背景与目标</h2><p>本机原本只装了一套 <strong>Vim 9.2 + gvim</strong>，用 vim-plug 管理插件（<code>~/.vim/plugged</code>），装过 coc.nvim，<code>~/.vimrc</code> 里配了中文编码和 Coc 补全快捷键。目标是：</p>
+<ul>
+<li>装一个 Neovim，配好 markdown-preview.nvim，实现编辑 <code>.md</code> 时的浏览器实时预览；</li>
+<li>全程不得影响现有 Vim 的配置与 coc.nvim。</li>
+</ul>
+<p>环境：Arch Linux、bash、<code>TERM=xterm-256color</code>、Node.js v26.5.1。</p>
+<h2 id="方案选型与共存检查"><a href="#方案选型与共存检查" class="headerlink" title="方案选型与共存检查"></a>方案选型与共存检查</h2><h3 id="为什么选-Neovim-markdown-preview-nvim"><a href="#为什么选-Neovim-markdown-preview-nvim" class="headerlink" title="为什么选 Neovim + markdown-preview.nvim"></a>为什么选 Neovim + markdown-preview.nvim</h3><p>Markdown 编辑器的方案很多（Typora &#x2F; Obsidian &#x2F; Mark Text 等），但既然机器上已有 Vim 工作流，最贴合的就是 <strong>Neovim + markdown-preview.nvim</strong>：同一套 vim-plug、同一个插件目录，两个编辑器共享。</p>
+<h3 id="与本地-Vim-的冲突检查"><a href="#与本地-Vim-的冲突检查" class="headerlink" title="与本地 Vim 的冲突检查"></a>与本地 Vim 的冲突检查</h3><table>
+<thead>
+<tr>
+<th>层面</th>
+<th>是否冲突</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>二进制&#x2F;包</td>
+<td>不冲突</td>
+<td><code>neovim</code> 与 <code>vim</code>&#x2F;<code>gvim</code> 是 Arch 官方源独立包，互不覆盖</td>
+</tr>
+<tr>
+<td>配置</td>
+<td>有一个坑</td>
+<td>Neovim 走 XDG 路径（<code>~/.config/nvim/</code>），不回退读 <code>~/.vimrc</code>；但前提是必须建独立 <code>init.vim</code>，否则 Neovim 会回退去 source <code>~/.vimrc</code>（带着 coc 配置），不干净</td>
+</tr>
+<tr>
+<td>插件</td>
+<td>不冲突</td>
+<td>vim-plug 两个编辑器通用，可以共享同一个 <code>~/.vim/plugged</code> 插件目录</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>已满足</td>
+<td>coc.nvim 和 markdown-preview 都需要 Node.js</td>
+</tr>
+</tbody></table>
+<h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a>搭建步骤</h2><h3 id="1-安装-Neovim"><a href="#1-安装-Neovim" class="headerlink" title="1. 安装 Neovim"></a>1. 安装 Neovim</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S --needed neovim</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-建独立配置-init-vim"><a href="#2-建独立配置-init-vim" class="headerlink" title="2. 建独立配置 init.vim"></a>2. 建独立配置 init.vim</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/.config/nvim</span><br></pre></td></tr></table></figure>
+
+<p><code>~/.config/nvim/init.vim</code>：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> encoding=utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">set</span> fileencodings=utf-<span class="number">8</span>,usc-bom,gb18030,gbk,gb2312</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; 复用 ~/.vim/plugged，与 Vim 共享插件目录</span></span><br><span class="line"><span class="keyword">call</span> plug#begin(<span class="string">&#x27;~/.vim/plugged&#x27;</span>)</span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;iamcco/markdown-preview.nvim&#x27;</span>, &#123; <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;cd app &amp;&amp; npm install&#x27;</span>, <span class="string">&#x27;for&#x27;</span>: [<span class="string">&#x27;markdown&#x27;</span>] &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> plug#end()</span><br><span class="line"></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;C-p&gt;</span> <span class="symbol">&lt;Plug&gt;</span>MarkdownPreviewToggle   <span class="comment">&quot; Ctrl+p 打开/刷新/关闭预览</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;Leader&gt;</span>mp <span class="symbol">&lt;Plug&gt;</span>MarkdownPreviewToggle  <span class="comment">&quot; \mp 切换预览</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;Leader&gt;</span>ms <span class="symbol">&lt;Plug&gt;</span>MarkdownPreviewStop    <span class="comment">&quot; \ms 停止预览</span></span><br></pre></td></tr></table></figure>
+
+<p>两点说明：</p>
+<ul>
+<li><strong><code>&#39;for&#39;: [&#39;markdown&#39;]</code></strong> 让插件只对 <code>.md</code> 文件懒加载，不拖慢启动；</li>
+<li><strong><code>do</code> 钩子用 <code>cd app &amp;&amp; npm install</code></strong> 而不是官方默认的 <code>mkdp#util#install()</code>——这是踩过坑之后的加固（见坑四）。</li>
+</ul>
+<h3 id="3-安装插件"><a href="#3-安装插件" class="headerlink" title="3. 安装插件"></a>3. 安装插件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim +<span class="string">&#x27;PlugInstall --sync&#x27;</span> +qa</span><br></pre></td></tr></table></figure>
+
+<h2 id="踩坑记录"><a href="#踩坑记录" class="headerlink" title="踩坑记录"></a>踩坑记录</h2><h3 id="坑一：E117-Unknown-function-plug-begin"><a href="#坑一：E117-Unknown-function-plug-begin" class="headerlink" title="坑一：E117: Unknown function: plug#begin"></a>坑一：<code>E117: Unknown function: plug#begin</code></h3><p><strong>现象</strong>：打开 nvim 报一堆 <code>plug#begin</code> &#x2F; <code>plug#end</code> 未知。</p>
+<p><strong>根因</strong>：vim-plug 的 <code>plug.vim</code> 在 <code>~/.vim/autoload/</code> 下，而 Neovim 的运行时路径不包含 <code>~/.vim</code>（XDG 化），自然找不到 <code>plug#begin</code> 函数。</p>
+<p><strong>解决</strong>：把 plug.vim 复制到 Neovim 自己的 autoload 目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/.config/nvim/autoload</span><br><span class="line"><span class="built_in">cp</span> ~/.vim/autoload/plug.vim ~/.config/nvim/autoload/</span><br></pre></td></tr></table></figure>
+
+<p>（另一个偷懒方案是 <code>set runtimepath+=~/.vim</code>，但会把 vim 的目录耦合进 nvim，不推荐。）</p>
+<h3 id="坑二：Ctrl-S-没反应"><a href="#坑二：Ctrl-S-没反应" class="headerlink" title="坑二：Ctrl+S 没反应"></a>坑二：<code>Ctrl+S</code> 没反应</h3><p><strong>现象</strong>：键位明明绑定了（<code>:verbose nmap &lt;C-s&gt;</code> 能查到），但按了毫无反应。</p>
+<p><strong>根因</strong>：Linux 终端把 <code>Ctrl+S</code> 当作流控命令 <strong>XOFF</strong>（暂停屏幕输出），根本不会传给 nvim。这是 Vim 用户的老熟人坑。</p>
+<p><strong>解决</strong>：关掉终端流控，或换个键：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 会话内生效</span></span><br><span class="line"><span class="built_in">stty</span> -ixon</span><br><span class="line"><span class="comment"># 永久生效（写入 ~/.bashrc / ~/.zshrc）</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;stty -ixon&quot;</span> &gt;&gt; ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p>更稳妥的做法是干脆换键（见下文 Ctrl+P）。</p>
+<h3 id="坑三：F5-被桌面抢走"><a href="#坑三：F5-被桌面抢走" class="headerlink" title="坑三：F5 被桌面抢走"></a>坑三：<code>F5</code> 被桌面抢走</h3><p><strong>现象</strong>：改成 F5 后依旧没反应。</p>
+<p><strong>根因</strong>：笔记本的 <code>F5</code> 是屏幕亮度键，被桌面&#x2F;硬件层截走，同样到不了 nvim。</p>
+<p><strong>结论</strong>：选键要避开三类：终端流控键（Ctrl+S&#x2F;Q）、桌面媒体&#x2F;功能键（F5~F8）、Vim 自身语义重要的键（Ctrl+O 跳转等）。<code>Ctrl+P</code> 在终端是普通控制字符、桌面不抢、Vim 默认无冲突，是最省心的选择。</p>
+<h3 id="坑四（最隐蔽）：预览按键静默失败-——-缺-node-modules"><a href="#坑四（最隐蔽）：预览按键静默失败-——-缺-node-modules" class="headerlink" title="坑四（最隐蔽）：预览按键静默失败 —— 缺 node_modules"></a>坑四（最隐蔽）：预览按键静默失败 —— 缺 node_modules</h3><p><strong>现象</strong>：插件装好了、键位绑好了、插件也加载了，但按任何预览键都毫无反应、不弹浏览器、状态栏也不报错。</p>
+<p><strong>根因</strong>：预览服务端是插件 <code>app/</code> 目录下的一个 Node.js 服务。<code>mkdp#util#install()</code> 拉下来的 <code>app/</code> 只有编译产物，<strong><code>node_modules</code> 依赖缺失</strong>。服务起不来，而插件对启动失败是「静默」的——这就是为什么前面一切检查看起来都正常。</p>
+<p><strong>定位过程</strong>：用 headless 模式直接触发预览函数，错误立刻现形：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim --headless test.md -c <span class="string">&#x27;call mkdp#util#toggle_preview()&#x27;</span> -c <span class="string">&#x27;sleep 3&#x27;</span> -c <span class="string">&#x27;messages&#x27;</span> -c <span class="string">&#x27;qall&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出暴露了真正的异常：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error: Cannot find module &#x27;tslib&#x27;</span><br><span class="line">Require stack: ~/.vim/plugged/markdown-preview.nvim/app/lib/app/index.js</span><br></pre></td></tr></table></figure>
+
+<p><strong>解决</strong>：进插件 app 目录补装依赖：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.vim/plugged/markdown-preview.nvim/app &amp;&amp; npm install</span><br></pre></td></tr></table></figure>
+
+<p>验证：保持 nvim 存活时能看到 node 服务进程、并确认其监听端口（本例为 <code>127.0.0.1:8175</code>，插件默认随机端口）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ss -tlnp | grep node</span><br></pre></td></tr></table></figure>
+
+<h2 id="诊断方法论（重点）"><a href="#诊断方法论（重点）" class="headerlink" title="诊断方法论（重点）"></a>诊断方法论（重点）</h2><p>这次最值得沉淀的不是某个命令，而是**「按键无响应」这类静默故障的分层排查法**：</p>
+<ol>
+<li><p><strong>确认插件有没有装上 &#x2F; 有没有加载</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim --headless test.md -c <span class="string">&#x27;scriptnames&#x27;</span> -c <span class="string">&#x27;qall&#x27;</span> | grep -i markdown</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>确认键位有没有绑定</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim --headless test.md -c <span class="string">&#x27;verbose nmap &lt;C-p&gt;&#x27;</span> -c <span class="string">&#x27;qall&#x27;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>确认配置有没有干净加载</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim --headless -c <span class="string">&#x27;qall&#x27;</span>   <span class="comment"># 无输出、exit 0 即干净</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>直接触发核心函数，把静默错误炸出来</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim --headless test.md -c <span class="string">&#x27;call mkdp#util#toggle_preview()&#x27;</span> -c <span class="string">&#x27;sleep 3&#x27;</span> -c <span class="string">&#x27;messages&#x27;</span> -c <span class="string">&#x27;qall&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>这一步把「没反应」从玄学变成可复现的错误信息，是本次破案的关键。</p>
+</li>
+<li><p><strong>确认服务真的起来了</strong>（不是端口探测，而是看进程 + 端口）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep index.js</span><br><span class="line">ss -tlnp | grep node</span><br></pre></td></tr></table></figure>
+<p>注意：预览服务随 nvim 会话退出而退出，所以要在 nvim 存活时查。</p>
+</li>
+</ol>
+<h2 id="最终快捷键"><a href="#最终快捷键" class="headerlink" title="最终快捷键"></a>最终快捷键</h2><table>
+<thead>
+<tr>
+<th>按键</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Ctrl+p</code></td>
+<td>打开 &#x2F; 刷新 &#x2F; 关闭预览（首选）</td>
+</tr>
+<tr>
+<td><code>\mp</code></td>
+<td>切换预览</td>
+</tr>
+<tr>
+<td><code>\ms</code> &#x2F; <code>Alt+s</code></td>
+<td>停止预览</td>
+</tr>
+</tbody></table>
+<h2 id="维护备忘"><a href="#维护备忘" class="headerlink" title="维护备忘"></a>维护备忘</h2><ul>
+<li><strong><code>PlugUpdate</code> 或重装后预览又失效</strong>，大概率是 node_modules 又丢了，重跑 <code>npm install</code> 即可：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.vim/plugged/markdown-preview.nvim/app &amp;&amp; npm install</span><br></pre></td></tr></table></figure></li>
+<li>因此配置里的 <code>do</code> 钩子建议固定为 <code>&#39;cd app &amp;&amp; npm install&#39;</code>，它幂等且总能保证依赖齐全。</li>
+<li>Vim 也想用这个预览？插件装在共享目录 <code>~/.vim/plugged</code>，只需往 <code>~/.vimrc</code> 加一行 <code>Plug &#39;iamcco/markdown-preview.nvim&#39;, { &#39;do&#39;: &#39;cd app &amp;&amp; npm install&#39; }</code> 然后 <code>:PlugInstall</code>，两个编辑器通用。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
