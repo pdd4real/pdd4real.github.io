@@ -18,6 +18,8 @@ tags:
 
 > 记录一次在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览（markdown-preview.nvim）的完整过程：与本地 Vim 的共存检查、配置落盘，以及四个连环踩坑——从 vim-plug 找不到、Ctrl+S 被终端吞掉、F5 被桌面抢走，到最终那个最隐蔽的「按键静默失败」：预览服务端缺 node_modules。重点沉淀了 headless 模式下的诊断方法论。
 
+<!-- more -->
+
 ## 背景与目标
 
 本机原本只装了一套 **Vim 9.2 + gvim**，用 vim-plug 管理插件（`~/.vim/plugged`），装过 coc.nvim，`~/.vimrc` 里配了中文编码和 Coc 补全快捷键。目标是：
@@ -41,8 +43,6 @@ Markdown 编辑器的方案很多（Typora / Obsidian / Mark Text 等），但�
 | 配置 | 有一个坑 | Neovim 走 XDG 路径（`~/.config/nvim/`），不回退读 `~/.vimrc`；但前提是必须建独立 `init.vim`，否则 Neovim 会回退去 source `~/.vimrc`（带着 coc 配置），不干净 |
 | 插件 | 不冲突 | vim-plug 两个编辑器通用，可以共享同一个 `~/.vim/plugged` 插件目录 |
 | 依赖 | 已满足 | coc.nvim 和 markdown-preview 都需要 Node.js |
-
-<!-- more -->
 
 ## 搭建步骤
 
