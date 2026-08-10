@@ -42,6 +42,8 @@ Markdown 编辑器的方案很多（Typora / Obsidian / Mark Text 等），但�
 | 插件 | 不冲突 | vim-plug 两个编辑器通用，可以共享同一个 `~/.vim/plugged` 插件目录 |
 | 依赖 | 已满足 | coc.nvim 和 markdown-preview 都需要 Node.js |
 
+<!-- more -->
+
 ## 搭建步骤
 
 ### 1. 安装 Neovim
