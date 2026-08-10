@@ -2,6 +2,7 @@
 title: Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录
 date: 2026-08-10 01:20:00
 updated: 2026-08-10 01:20:00
+description: 在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览的完整记录：与 Vim 共存检查、四个连环踩坑与 headless 排障方法论。
 categories:
   - Linux
 tags:
@@ -13,8 +14,6 @@ tags:
   - Node.js
   - 排障
 ---
-
-# Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录
 
 > 记录一次在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览（markdown-preview.nvim）的完整过程：与本地 Vim 的共存检查、配置落盘，以及四个连环踩坑——从 vim-plug 找不到、Ctrl+S 被终端吞掉、F5 被桌面抢走，到最终那个最隐蔽的「按键静默失败」：预览服务端缺 node_modules。重点沉淀了 headless 模式下的诊断方法论。
 
