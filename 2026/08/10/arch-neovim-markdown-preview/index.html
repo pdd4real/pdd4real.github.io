@@ -251,6 +251,8 @@
     <div class="post-body" itemprop="articleBody"><h1 id="Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录"><a href="#Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录" class="headerlink" title="Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录"></a>Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</h1><blockquote>
 <p>记录一次在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览（markdown-preview.nvim）的完整过程：与本地 Vim 的共存检查、配置落盘，以及四个连环踩坑——从 vim-plug 找不到、Ctrl+S 被终端吞掉、F5 被桌面抢走，到最终那个最隐蔽的「按键静默失败」：预览服务端缺 node_modules。重点沉淀了 headless 模式下的诊断方法论。</p>
 </blockquote>
+<span id="more"></span>
+
 <h2 id="背景与目标"><a href="#背景与目标" class="headerlink" title="背景与目标"></a>背景与目标</h2><p>本机原本只装了一套 <strong>Vim 9.2 + gvim</strong>，用 vim-plug 管理插件（<code>~/.vim/plugged</code>），装过 coc.nvim，<code>~/.vimrc</code> 里配了中文编码和 Coc 补全快捷键。目标是：</p>
 <ul>
 <li>装一个 Neovim，配好 markdown-preview.nvim，实现编辑 <code>.md</code> 时的浏览器实时预览；</li>
@@ -287,8 +289,6 @@
 <td>coc.nvim 和 markdown-preview 都需要 Node.js</td>
 </tr>
 </tbody></table>
-<span id="more"></span>
-
 <h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a>搭建步骤</h2><h3 id="1-安装-Neovim"><a href="#1-安装-Neovim" class="headerlink" title="1. 安装 Neovim"></a>1. 安装 Neovim</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S --needed neovim</span><br></pre></td></tr></table></figure>
 
 <h3 id="2-建独立配置-init-vim"><a href="#2-建独立配置-init-vim" class="headerlink" title="2. 建独立配置 init.vim"></a>2. 建独立配置 init.vim</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p ~/.config/nvim</span><br></pre></td></tr></table></figure>

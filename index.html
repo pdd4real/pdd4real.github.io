@@ -239,42 +239,6 @@
           <h1 id="Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录"><a href="#Arch-Linux-上-Neovim-markdown-preview-实时预览搭建与踩坑全记录" class="headerlink" title="Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录"></a>Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</h1><blockquote>
 <p>记录一次在 Arch Linux 上为 Neovim 搭建 Markdown 实时预览（markdown-preview.nvim）的完整过程：与本地 Vim 的共存检查、配置落盘，以及四个连环踩坑——从 vim-plug 找不到、Ctrl+S 被终端吞掉、F5 被桌面抢走，到最终那个最隐蔽的「按键静默失败」：预览服务端缺 node_modules。重点沉淀了 headless 模式下的诊断方法论。</p>
 </blockquote>
-<h2 id="背景与目标"><a href="#背景与目标" class="headerlink" title="背景与目标"></a>背景与目标</h2><p>本机原本只装了一套 <strong>Vim 9.2 + gvim</strong>，用 vim-plug 管理插件（<code>~/.vim/plugged</code>），装过 coc.nvim，<code>~/.vimrc</code> 里配了中文编码和 Coc 补全快捷键。目标是：</p>
-<ul>
-<li>装一个 Neovim，配好 markdown-preview.nvim，实现编辑 <code>.md</code> 时的浏览器实时预览；</li>
-<li>全程不得影响现有 Vim 的配置与 coc.nvim。</li>
-</ul>
-<p>环境：Arch Linux、bash、<code>TERM=xterm-256color</code>、Node.js v26.5.1。</p>
-<h2 id="方案选型与共存检查"><a href="#方案选型与共存检查" class="headerlink" title="方案选型与共存检查"></a>方案选型与共存检查</h2><h3 id="为什么选-Neovim-markdown-preview-nvim"><a href="#为什么选-Neovim-markdown-preview-nvim" class="headerlink" title="为什么选 Neovim + markdown-preview.nvim"></a>为什么选 Neovim + markdown-preview.nvim</h3><p>Markdown 编辑器的方案很多（Typora &#x2F; Obsidian &#x2F; Mark Text 等），但既然机器上已有 Vim 工作流，最贴合的就是 <strong>Neovim + markdown-preview.nvim</strong>：同一套 vim-plug、同一个插件目录，两个编辑器共享。</p>
-<h3 id="与本地-Vim-的冲突检查"><a href="#与本地-Vim-的冲突检查" class="headerlink" title="与本地 Vim 的冲突检查"></a>与本地 Vim 的冲突检查</h3><table>
-<thead>
-<tr>
-<th>层面</th>
-<th>是否冲突</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>二进制&#x2F;包</td>
-<td>不冲突</td>
-<td><code>neovim</code> 与 <code>vim</code>&#x2F;<code>gvim</code> 是 Arch 官方源独立包，互不覆盖</td>
-</tr>
-<tr>
-<td>配置</td>
-<td>有一个坑</td>
-<td>Neovim 走 XDG 路径（<code>~/.config/nvim/</code>），不回退读 <code>~/.vimrc</code>；但前提是必须建独立 <code>init.vim</code>，否则 Neovim 会回退去 source <code>~/.vimrc</code>（带着 coc 配置），不干净</td>
-</tr>
-<tr>
-<td>插件</td>
-<td>不冲突</td>
-<td>vim-plug 两个编辑器通用，可以共享同一个 <code>~/.vim/plugged</code> 插件目录</td>
-</tr>
-<tr>
-<td>依赖</td>
-<td>已满足</td>
-<td>coc.nvim 和 markdown-preview 都需要 Node.js</td>
-</tr>
-</tbody></table>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2026/08/10/arch-neovim-markdown-preview/#more" rel="contents">
