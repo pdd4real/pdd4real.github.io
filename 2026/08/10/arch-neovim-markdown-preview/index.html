@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/main.css?v=134c2446ce">
 
 
 
@@ -69,6 +69,12 @@
   
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"ams","display_overflow":"scroll","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-mml-chtml.js","integrity":"sha256-ihPtDDm7pTmSF9ViEsItlvsrBTsNkz0MOXMchzOwCQw="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
 
 
 
@@ -134,7 +140,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Arch-Linux-%E4%B8%8A-Neovim-markdown-preview-%E5%AE%9E%E6%97%B6%E9%A2%84%E8%A7%88%E6%90%AD%E5%BB%BA%E4%B8%8E%E8%B8%A9%E5%9D%91%E5%85%A8%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">背景与目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E9%80%89%E5%9E%8B%E4%B8%8E%E5%85%B1%E5%AD%98%E6%A3%80%E6%9F%A5"><span class="nav-number">1.2.</span> <span class="nav-text">方案选型与共存检查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89-Neovim-markdown-preview-nvim"><span class="nav-number">1.2.1.</span> <span class="nav-text">为什么选 Neovim + markdown-preview.nvim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E6%9C%AC%E5%9C%B0-Vim-%E7%9A%84%E5%86%B2%E7%AA%81%E6%A3%80%E6%9F%A5"><span class="nav-number">1.2.2.</span> <span class="nav-text">与本地 Vim 的冲突检查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.3.</span> <span class="nav-text">搭建步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85-Neovim"><span class="nav-number">1.3.1.</span> <span class="nav-text">1. 安装 Neovim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BB%BA%E7%8B%AC%E7%AB%8B%E9%85%8D%E7%BD%AE-init-vim"><span class="nav-number">1.3.2.</span> <span class="nav-text">2. 建独立配置 init.vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E6%8F%92%E4%BB%B6"><span class="nav-number">1.3.3.</span> <span class="nav-text">3. 安装插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="nav-number">1.4.</span> <span class="nav-text">踩坑记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%B8%80%EF%BC%9AE117-Unknown-function-plug-begin"><span class="nav-number">1.4.1.</span> <span class="nav-text">坑一：E117: Unknown function: plug#begin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%BA%8C%EF%BC%9ACtrl-S-%E6%B2%A1%E5%8F%8D%E5%BA%94"><span class="nav-number">1.4.2.</span> <span class="nav-text">坑二：Ctrl+S 没反应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%B8%89%EF%BC%9AF5-%E8%A2%AB%E6%A1%8C%E9%9D%A2%E6%8A%A2%E8%B5%B0"><span class="nav-number">1.4.3.</span> <span class="nav-text">坑三：F5 被桌面抢走</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E5%9B%9B%EF%BC%88%E6%9C%80%E9%9A%90%E8%94%BD%EF%BC%89%EF%BC%9A%E9%A2%84%E8%A7%88%E6%8C%89%E9%94%AE%E9%9D%99%E9%BB%98%E5%A4%B1%E8%B4%A5-%E2%80%94%E2%80%94-%E7%BC%BA-node-modules"><span class="nav-number">1.4.4.</span> <span class="nav-text">坑四（最隐蔽）：预览按键静默失败 —— 缺 node_modules</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8A%E6%96%AD%E6%96%B9%E6%B3%95%E8%AE%BA%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">诊断方法论（重点）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="nav-number">1.6.</span> <span class="nav-text">最终快捷键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%B4%E6%8A%A4%E5%A4%87%E5%BF%98"><span class="nav-number">1.7.</span> <span class="nav-text">维护备忘</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Arch-Linux-%E4%B8%8A-Neovim-markdown-preview-%E5%AE%9E%E6%97%B6%E9%A2%84%E8%A7%88%E6%90%AD%E5%BB%BA%E4%B8%8E%E8%B8%A9%E5%9D%91%E5%85%A8%E8%AE%B0%E5%BD%95"><span class="nav-text">Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E7%9B%AE%E6%A0%87"><span class="nav-text">背景与目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E9%80%89%E5%9E%8B%E4%B8%8E%E5%85%B1%E5%AD%98%E6%A3%80%E6%9F%A5"><span class="nav-text">方案选型与共存检查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89-Neovim-markdown-preview-nvim"><span class="nav-text">为什么选 Neovim + markdown-preview.nvim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E6%9C%AC%E5%9C%B0-Vim-%E7%9A%84%E5%86%B2%E7%AA%81%E6%A3%80%E6%9F%A5"><span class="nav-text">与本地 Vim 的冲突检查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%AD%A5%E9%AA%A4"><span class="nav-text">搭建步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85-Neovim"><span class="nav-text">1. 安装 Neovim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%BB%BA%E7%8B%AC%E7%AB%8B%E9%85%8D%E7%BD%AE-init-vim"><span class="nav-text">2. 建独立配置 init.vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E6%8F%92%E4%BB%B6"><span class="nav-text">3. 安装插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="nav-text">踩坑记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%B8%80%EF%BC%9AE117-Unknown-function-plug-begin"><span class="nav-text">坑一：E117: Unknown function: plug#begin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%BA%8C%EF%BC%9ACtrl-S-%E6%B2%A1%E5%8F%8D%E5%BA%94"><span class="nav-text">坑二：Ctrl+S 没反应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E4%B8%89%EF%BC%9AF5-%E8%A2%AB%E6%A1%8C%E9%9D%A2%E6%8A%A2%E8%B5%B0"><span class="nav-text">坑三：F5 被桌面抢走</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91%E5%9B%9B%EF%BC%88%E6%9C%80%E9%9A%90%E8%94%BD%EF%BC%89%EF%BC%9A%E9%A2%84%E8%A7%88%E6%8C%89%E9%94%AE%E9%9D%99%E9%BB%98%E5%A4%B1%E8%B4%A5-%E2%80%94%E2%80%94-%E7%BC%BA-node-modules"><span class="nav-text">坑四（最隐蔽）：预览按键静默失败 —— 缺 node_modules</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8A%E6%96%AD%E6%96%B9%E6%B3%95%E8%AE%BA%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-text">诊断方法论（重点）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="nav-text">最终快捷键</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%B4%E6%8A%A4%E5%A4%87%E5%BF%98"><span class="nav-text">维护备忘</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -149,18 +155,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -391,8 +397,8 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/08/05/arch-windows-remote-desktop/" rel="prev" title="Arch Linux × Windows 跨设备远程桌面搭建全记录">
-                  <i class="fa fa-angle-left"></i> Arch Linux × Windows 跨设备远程桌面搭建全记录
+                <a href="/2026/08/06/computer-architecture-review/" rel="prev" title="计算机组成原理复习：从数据表示到 CPU、存储与 I&#x2F;O">
+                  <i class="fa fa-angle-left"></i> 计算机组成原理复习：从数据表示到 CPU、存储与 I/O
                 </a>
             </div>
             <div class="post-nav-item">

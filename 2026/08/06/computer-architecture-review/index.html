@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=134c2446ce">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pdd4real.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="计算机组成原理复习笔记，涵盖数据表示、性能评价、RISC-V、CPU 数据通路、流水线、Cache、主存扩展、校验码与 I&#x2F;O。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机组成原理复习：从数据表示到 CPU、存储与 I&#x2F;O">
+<meta property="og:url" content="https://pdd4real.github.io/2026/08/06/computer-architecture-review/index.html">
+<meta property="og:site_name" content="Pan&#39;s blog">
+<meta property="og:description" content="计算机组成原理复习笔记，涵盖数据表示、性能评价、RISC-V、CPU 数据通路、流水线、Cache、主存扩展、校验码与 I&#x2F;O。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/memory-layout.png">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/single-cycle-datapath.png">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/pipeline-datapath.png">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/branch-predictor.png">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/ram-expansion.png">
+<meta property="og:image" content="https://pdd4real.github.io/images/computer-architecture/hamming-code.png">
+<meta property="article:published_time" content="2026-08-06T08:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-06T08:30:00.000Z">
+<meta property="article:author" content="pdd4real">
+<meta property="article:tag" content="CPU">
+<meta property="article:tag" content="Cache">
+<meta property="article:tag" content="Memory">
+<meta property="article:tag" content="RISC-V">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pdd4real.github.io/images/computer-architecture/memory-layout.png">
+
+
+<link rel="canonical" href="https://pdd4real.github.io/2026/08/06/computer-architecture-review/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pdd4real.github.io/2026/08/06/computer-architecture-review/","path":"2026/08/06/computer-architecture-review/","title":"计算机组成原理复习：从数据表示到 CPU、存储与 I/O"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机组成原理复习：从数据表示到 CPU、存储与 I/O | Pan's blog</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"ams","display_overflow":"scroll","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-mml-chtml.js","integrity":"sha256-ihPtDDm7pTmSF9ViEsItlvsrBTsNkz0MOXMchzOwCQw="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Pan's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%8F%90%E5%8D%87%E4%B8%8E%E7%A8%8B%E5%BA%8F%E7%BF%BB%E8%AF%91"><span class="nav-text">整数类型提升与程序翻译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E7%B1%BB%E5%9E%8B%E6%8F%90%E5%8D%87"><span class="nav-text">整数类型提升</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E6%BA%90%E7%A8%8B%E5%BA%8F%E5%88%B0%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6"><span class="nav-text">从源程序到可执行文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%AF%84%E4%BB%B7"><span class="nav-text">性能评价</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%8C%87%E6%A0%87"><span class="nav-text">基本指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Amdahl-%E5%AE%9A%E5%BE%8B"><span class="nav-text">Amdahl 定律</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%97%B6%E9%92%9F%E5%91%A8%E6%9C%9F"><span class="nav-text">流水线时钟周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4"><span class="nav-text">磁盘访问时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E7%82%B9%E6%95%B0%E3%80%81%E6%B5%AE%E7%82%B9%E6%95%B0%E4%B8%8E%E5%8A%A0%E6%B3%95%E5%99%A8"><span class="nav-text">定点数、浮点数与加法器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E7%A0%81%E4%B8%8E%E7%A7%BB%E7%A0%81"><span class="nav-text">补码与移码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IEEE-754-%E5%8D%95%E7%B2%BE%E5%BA%A6%E6%B5%AE%E7%82%B9%E6%95%B0"><span class="nav-text">IEEE 754 单精度浮点数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E6%B3%95%E5%99%A8%E4%B8%8E%E7%8A%B6%E6%80%81%E6%A0%87%E5%BF%97"><span class="nav-text">加法器与状态标志</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RISC-V-%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F"><span class="nav-text">RISC-V 指令格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E7%A7%8D%E5%9F%BA%E6%9C%AC%E6%A0%BC%E5%BC%8F"><span class="nav-text">六种基本格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RISC-V-%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A"><span class="nav-text">RISC-V 调用约定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E5%B7%A5"><span class="nav-text">寄存器分工</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%91%A8%E6%9C%9F%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-text">单周期处理器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%8E%E5%86%92%E9%99%A9"><span class="nav-text">流水线与冒险</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-text">五级流水线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%89%8D%E9%80%92"><span class="nav-text">数据前递</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Load-use-%E5%86%92%E9%99%A9"><span class="nav-text">Load-use 冒险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%86%92%E9%99%A9"><span class="nav-text">控制冒险</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1%E3%80%81TLB%E3%80%81%E9%A1%B5%E8%A1%A8%E4%B8%8E-Cache"><span class="nav-text">存储层次、TLB、页表与 Cache</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E4%B8%8E%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE"><span class="nav-text">地址转换与数据访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-%E5%9C%B0%E5%9D%80%E5%88%92%E5%88%86"><span class="nav-text">Cache 地址划分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E4%B8%8E%E4%B8%BB%E5%AD%98%E8%BF%9E%E6%8E%A5%E5%8F%8A-RAM-%E6%89%A9%E5%B1%95"><span class="nav-text">CPU 与主存连接及 RAM 扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1"><span class="nav-text">存储层次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%B1%BB%E6%80%BB%E7%BA%BF"><span class="nav-text">三类总线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%A0%A1%E9%AA%8C%EF%BC%9A%E6%B5%B7%E6%98%8E%E7%A0%81%E4%B8%8E-CRC"><span class="nav-text">数据校验：海明码与 CRC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%B7%E6%98%8E%E7%A0%81%E4%B8%8E-SEC-DED"><span class="nav-text">海明码与 SEC&#x2F;DED</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CRC"><span class="nav-text">CRC</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-O-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-text">I&#x2F;O 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E4%B8%8E%E7%BC%96%E5%9D%80"><span class="nav-text">端口与编址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%8E%A7%E5%88%B6%E6%96%B9%E5%BC%8F"><span class="nav-text">三种控制方式</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="pdd4real"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">pdd4real</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/pdd4real" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;pdd4real" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pdd4real.github.io/2026/08/06/computer-architecture-review/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="pdd4real">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pan's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计算机组成原理复习：从数据表示到 CPU、存储与 I&#x2F;O | Pan's blog">
+      <meta itemprop="description" content="计算机组成原理复习笔记，涵盖数据表示、性能评价、RISC-V、CPU 数据通路、流水线、Cache、主存扩展、校验码与 I&#x2F;O。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机组成原理复习：从数据表示到 CPU、存储与 I/O
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-08-06 16:30:00" itemprop="dateCreated datePublished" datetime="2026-08-06T16:30:00+08:00">2026-08-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90/" itemprop="url" rel="index"><span itemprop="name">计算机组成</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">计算机组成原理复习笔记，涵盖数据表示、性能评价、RISC-V、CPU 数据通路、流水线、Cache、主存扩展、校验码与 I/O。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>这篇文章整理了计算机组成原理复习中的主要知识点，从程序如何变成机器指令开始，依次梳理数据表示、RISC-V、CPU 数据通路、流水线、存储层次、RAM 扩展以及 I&#x2F;O。重点放在容易混淆的概念、常用公式和典型计算方法上。</p>
+<span id="more"></span>
+
+<h2 id="整数类型提升与程序翻译"><a href="#整数类型提升与程序翻译" class="headerlink" title="整数类型提升与程序翻译"></a>整数类型提升与程序翻译</h2><h3 id="整数类型提升"><a href="#整数类型提升" class="headerlink" title="整数类型提升"></a>整数类型提升</h3><p>在 C 语言表达式中，<code>char</code>、<code>short</code> 和枚举等整数类型通常先提升为 <code>int</code>；如果 <code>int</code> 无法表示原类型的全部值，则提升为 <code>unsigned int</code>。参与运算的类型仍不一致时，再按通常算术转换规则统一类型。</p>
+<p>有符号数和无符号数混合运算时，不能简单理解为“无符号一定占优”，还要考虑两种类型的转换等级和表示范围。例如在常见的 32 位模型中：</p>
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>转换后的比较</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-1 &lt; 1u</code></td>
+<td><code>unsigned int &lt; unsigned int</code></td>
+<td>false</td>
+</tr>
+<tr>
+<td><code>-1L &lt; 1u</code></td>
+<td><code>long &lt; long</code></td>
+<td>true（当 <code>long</code> 能表示全部 <code>unsigned int</code> 值时）</td>
+</tr>
+<tr>
+<td><code>(short)-1 &lt; 1u</code></td>
+<td>先提升，再转为 <code>unsigned int</code></td>
+<td>false</td>
+</tr>
+<tr>
+<td><code>2147483647U &gt; -2147483647-1</code></td>
+<td><code>unsigned int &gt; unsigned int</code></td>
+<td>false</td>
+</tr>
+</tbody></table>
+<p>典型 32 位 <code>int</code> 中，<code>INT_MAX = 2^{31}-1</code>，<code>INT_MIN = -2^{31}</code>。实际宽度仍由具体 ABI 和实现决定。</p>
+<h3 id="从源程序到可执行文件"><a href="#从源程序到可执行文件" class="headerlink" title="从源程序到可执行文件"></a>从源程序到可执行文件</h3><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>输入</th>
+<th>输出</th>
+<th>主要工作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>预处理</td>
+<td><code>.c</code></td>
+<td><code>.i</code></td>
+<td>展开宏、包含头文件、处理条件编译</td>
+</tr>
+<tr>
+<td>编译</td>
+<td><code>.i</code></td>
+<td><code>.s</code></td>
+<td>生成汇编代码</td>
+</tr>
+<tr>
+<td>汇编</td>
+<td><code>.s</code></td>
+<td><code>.o</code></td>
+<td>生成可重定位目标文件</td>
+</tr>
+<tr>
+<td>链接</td>
+<td><code>.o</code>、库</td>
+<td>可执行文件</td>
+<td>合并目标文件、解析符号、重定位地址</td>
+</tr>
+</tbody></table>
+<p>高级语言最终被翻译为 ISA 定义的机器指令，CPU 再把指令译码为数据通路中的控制信号。</p>
+<h2 id="性能评价"><a href="#性能评价" class="headerlink" title="性能评价"></a>性能评价</h2><h3 id="基本指标"><a href="#基本指标" class="headerlink" title="基本指标"></a>基本指标</h3><p>五级流水线通常分为 <code>IF</code>、<code>ID</code>、<code>EX</code>、<code>MEM</code>、<code>WB</code>。时钟周期是相邻时钟边沿之间的时间，时钟频率为其倒数。平均 CPI 为：</p>
+<p>$$<br>\mathrm{CPI}_{avg}&#x3D;\frac{\text{总时钟周期数}}{\text{总指令数}}<br>&#x3D;\sum_{i&#x3D;1}^{n}\left(\mathrm{CPI}_i\times P_i\right)<br>$$</p>
+<p>CPU 执行时间可写为：</p>
+<p>$$<br>T_{CPU}&#x3D;\text{指令数}\times \mathrm{CPI}_{avg}\times T_{clk}<br>$$</p>
+<p>加速比定义为旧执行时间除以新执行时间：</p>
+<p>$$<br>\mathrm{Speedup}&#x3D;\frac{T_{old}}{T_{new}}<br>$$</p>
+<h3 id="Amdahl-定律"><a href="#Amdahl-定律" class="headerlink" title="Amdahl 定律"></a>Amdahl 定律</h3><p>若可优化部分占原执行时间的比例为 $p$，该部分加速 $s$ 倍，则整体加速比为：</p>
+<p>$$<br>\mathrm{Speedup}_{overall}&#x3D;\frac{1}{(1-p)+\frac{p}{s}}<br>$$</p>
+<p>它说明局部优化的上限受未优化部分限制。</p>
+<h3 id="流水线时钟周期"><a href="#流水线时钟周期" class="headerlink" title="流水线时钟周期"></a>流水线时钟周期</h3><p>若每级组合逻辑延迟为 $t_i$，流水线寄存器开销为 $t_{reg}$，则：</p>
+<p>$$<br>T_{clk}&#x3D;\max{t_{IF},t_{ID},t_{EX},t_{MEM},t_{WB}}+t_{reg}<br>$$</p>
+<p>拆分某一级时，需要先分离组合逻辑延迟与寄存器开销，再比较拆分后各级的总延迟。</p>
+<h3 id="磁盘访问时间"><a href="#磁盘访问时间" class="headerlink" title="磁盘访问时间"></a>磁盘访问时间</h3><p>机械硬盘读取时间通常近似为：</p>
+<p>$$<br>T_{read}&#x3D;T_{seek}+T_{rotation}+\frac{\text{数据量}}{\text{内部传输率}}<br>$$</p>
+<p>平均旋转延迟通常取旋转半圈的时间；若题目给出排队或控制器延迟，还需一并加入。</p>
+<h2 id="定点数、浮点数与加法器"><a href="#定点数、浮点数与加法器" class="headerlink" title="定点数、浮点数与加法器"></a>定点数、浮点数与加法器</h2><h3 id="补码与移码"><a href="#补码与移码" class="headerlink" title="补码与移码"></a>补码与移码</h3><p>补码可以看作模 $2^n$ 的运算系统。求负数补码时，对对应正数的全部位取反再加一。例如，$-0.625$ 的 8 位定点补码（1 位符号位、7 位小数位）为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+0.625: 0.1010000</span><br><span class="line">按位取反: 1.0101111</span><br><span class="line">末位加一: 1.0110000</span><br></pre></td></tr></table></figure>
+
+<p>一般移码是在真值上加 $2^{n-1}$；IEEE 754 阶码采用的偏置值则是 $2^{n-1}-1$。</p>
+<h3 id="IEEE-754-单精度浮点数"><a href="#IEEE-754-单精度浮点数" class="headerlink" title="IEEE 754 单精度浮点数"></a>IEEE 754 单精度浮点数</h3><p>32 位单精度浮点数由 1 位符号、8 位阶码和 23 位尾数组成。对规格化数：</p>
+<p>$$<br>x&#x3D;(-1)^S\times(1+M)\times2^{E-127}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th>阶码</th>
+<th>尾数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全 0</td>
+<td>全 0</td>
+<td>正零或负零</td>
+</tr>
+<tr>
+<td>全 0</td>
+<td>非 0</td>
+<td>非规格化数</td>
+</tr>
+<tr>
+<td>1 到 254</td>
+<td>任意</td>
+<td>规格化数</td>
+</tr>
+<tr>
+<td>全 1</td>
+<td>全 0</td>
+<td>正无穷或负无穷</td>
+</tr>
+<tr>
+<td>全 1</td>
+<td>非 0</td>
+<td>NaN</td>
+</tr>
+</tbody></table>
+<p>最小正规格化数为 $2^{-126}$，非规格化数使用固定指数 $-126$，最小正非规格化数为 $2^{-149}$。当数值达到 $2^{24}$ 后，相邻可表示数的间隔变为 2，因此不能精确表示的最小正整数是 $2^{24}+1$。</p>
+<h3 id="加法器与状态标志"><a href="#加法器与状态标志" class="headerlink" title="加法器与状态标志"></a>加法器与状态标志</h3><p>一位全加器满足：</p>
+<p>$$<br>\begin{array}{l}<br>C_{out}&#x3D;AB+AC_{in}+BC_{in} \\<br>S&#x3D;A\oplus B\oplus C_{in}<br>\end{array}<br>$$</p>
+<p>先行进位中，可定义 $G_i&#x3D;A_iB_i$、$P_i&#x3D;A_i\oplus B_i$，于是：</p>
+<p>$$<br>C_{i+1}&#x3D;G_i+P_iC_i<br>$$</p>
+<p>常见标志包括：<code>OF</code> 表示有符号溢出，<code>SF</code> 取结果最高位，<code>ZF</code> 在结果为零时置位。<code>CF</code> 表示无符号进位或借位，其具体解释与加减法器实现和 ISA 约定有关，不能把同一个公式机械套用于所有加减法。</p>
+<h2 id="RISC-V-指令格式"><a href="#RISC-V-指令格式" class="headerlink" title="RISC-V 指令格式"></a>RISC-V 指令格式</h2><h3 id="六种基本格式"><a href="#六种基本格式" class="headerlink" title="六种基本格式"></a>六种基本格式</h3><p>R 型指令的典型语法是 <code>op rd, rs1, rs2</code>，字段排列为：</p>
+<table>
+<thead>
+<tr>
+<th>31:25</th>
+<th>24:20</th>
+<th>19:15</th>
+<th>14:12</th>
+<th>11:7</th>
+<th>6:0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>funct7</code></td>
+<td><code>rs2</code></td>
+<td><code>rs1</code></td>
+<td><code>funct3</code></td>
+<td><code>rd</code></td>
+<td><code>opcode</code></td>
+</tr>
+</tbody></table>
+<p>其余格式可以从用途上记忆：</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>典型语法</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>I</td>
+<td><code>op rd, rs1, imm12</code></td>
+<td>立即数运算、load、<code>jalr</code></td>
+</tr>
+<tr>
+<td>S</td>
+<td><code>sw rs2, offset(rs1)</code></td>
+<td>store，<code>rs1</code> 是基址，<code>rs2</code> 是待写数据</td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>beq rs1, rs2, offset</code></td>
+<td>条件分支</td>
+</tr>
+<tr>
+<td>U</td>
+<td><code>lui rd, imm20</code></td>
+<td>高位立即数</td>
+</tr>
+<tr>
+<td>J</td>
+<td><code>jal rd, offset</code></td>
+<td>PC 相对跳转并保存返回地址</td>
+</tr>
+</tbody></table>
+<p>常用指令包括 <code>add/sub/xor/and/or</code>、<code>addi</code>、<code>lw/sw</code>、<code>beq/bne</code>、<code>lui/auipc</code> 和 <code>jal/jalr</code>。<code>srl</code> 左侧补 0，<code>sra</code> 保留符号；<code>slt</code> 进行有符号比较；<code>auipc</code> 把高位立即数加到当前 PC。</p>
+<h2 id="RISC-V-调用约定"><a href="#RISC-V-调用约定" class="headerlink" title="RISC-V 调用约定"></a>RISC-V 调用约定</h2><h3 id="寄存器分工"><a href="#寄存器分工" class="headerlink" title="寄存器分工"></a>寄存器分工</h3><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>ABI 名称</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x1</code></td>
+<td><code>ra</code></td>
+<td>返回地址</td>
+</tr>
+<tr>
+<td><code>x2</code></td>
+<td><code>sp</code></td>
+<td>栈指针</td>
+</tr>
+<tr>
+<td><code>x5-x7, x28-x31</code></td>
+<td><code>t0-t6</code></td>
+<td>临时寄存器，调用者保存</td>
+</tr>
+<tr>
+<td><code>x8-x9, x18-x27</code></td>
+<td><code>s0-s11</code></td>
+<td>保存寄存器，被调用者保存</td>
+</tr>
+<tr>
+<td><code>x10-x17</code></td>
+<td><code>a0-a7</code></td>
+<td>参数和返回值</td>
+</tr>
+</tbody></table>
+<p><img src="/images/computer-architecture/memory-layout.png" alt="程序的典型内存布局"></p>
+<p>栈从高地址向低地址增长。调用者只需保存调用后仍然存活的 caller-saved 值；被调用者若修改了 callee-saved 寄存器，就必须在返回前恢复。非叶子函数还要妥善保存 <code>ra</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 一个会继续调用其他函数的被调用者</span><br><span class="line">addi sp, sp, -16</span><br><span class="line">sw   ra, 12(sp)</span><br><span class="line">sw   s0, 8(sp)</span><br><span class="line"></span><br><span class="line">mv   s0, a0</span><br><span class="line">jal  ra, other</span><br><span class="line"></span><br><span class="line">lw   s0, 8(sp)</span><br><span class="line">lw   ra, 12(sp)</span><br><span class="line">addi sp, sp, 16</span><br><span class="line">jalr x0, 0(ra)</span><br></pre></td></tr></table></figure>
+
+<p>参数超过 <code>a0-a7</code> 的容量时，多出的参数通过栈传递。叶子函数不调用其他函数，通常可以省去保存 <code>ra</code> 的步骤。</p>
+<h2 id="单周期处理器"><a href="#单周期处理器" class="headerlink" title="单周期处理器"></a>单周期处理器</h2><p><img src="/images/computer-architecture/single-cycle-datapath.png" alt="单周期处理器数据通路"></p>
+<p>单周期处理器让一条指令在一个时钟周期内完成，时钟周期必须覆盖最慢指令的数据通路。理解这部分的关键，是跟踪数据流向并确定控制信号。</p>
+<table>
+<thead>
+<tr>
+<th>指令类别</th>
+<th align="right">寄存器写</th>
+<th align="right">存储器写</th>
+<th>ALU 第二操作数</th>
+<th>写回来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R 型</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td><code>rs2</code></td>
+<td>ALU</td>
+</tr>
+<tr>
+<td>I 型算术</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td>立即数</td>
+<td>ALU</td>
+</tr>
+<tr>
+<td>load</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td>立即数</td>
+<td>数据存储器</td>
+</tr>
+<tr>
+<td>store</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td>立即数</td>
+<td>不写回</td>
+</tr>
+<tr>
+<td>branch</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td><code>rs2</code></td>
+<td>不写回</td>
+</tr>
+<tr>
+<td><code>jal</code></td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td>常数 4</td>
+<td><code>PC+4</code></td>
+</tr>
+</tbody></table>
+<p>例如，R 型数据大致沿 <code>rs1/rs2 -&gt; ALU -&gt; rd</code> 流动；load 先用 <code>rs1 + imm</code> 计算地址，再访问数据存储器并写回 <code>rd</code>；store 计算地址后把 <code>rs2</code> 写入存储器；分支根据比较结果选择 <code>PC+4</code> 或分支目标地址。</p>
+<h2 id="流水线与冒险"><a href="#流水线与冒险" class="headerlink" title="流水线与冒险"></a>流水线与冒险</h2><h3 id="五级流水线"><a href="#五级流水线" class="headerlink" title="五级流水线"></a>五级流水线</h3><p>流水线把指令拆分为取指、译码、执行、访存和写回。流水线寄存器不仅保存数据，也保存后续阶段需要的控制信号。</p>
+<p><img src="/images/computer-architecture/pipeline-datapath.png" alt="带冒险处理的流水线数据通路"></p>
+<h3 id="数据前递"><a href="#数据前递" class="headerlink" title="数据前递"></a>数据前递</h3><p>当前指令在 EX 阶段需要的结果尚未写回寄存器堆时，可以直接从后面的流水线寄存器取值：</p>
+<table>
+<thead>
+<tr>
+<th>前递选择</th>
+<th>数据来源</th>
+<th>常见情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>00</code></td>
+<td><code>ID/EX</code></td>
+<td>无相关或数据已可从寄存器堆读取</td>
+</tr>
+<tr>
+<td><code>10</code></td>
+<td><code>EX/MEM</code></td>
+<td>使用上一条 ALU 指令的结果</td>
+</tr>
+<tr>
+<td><code>01</code></td>
+<td><code>MEM/WB</code></td>
+<td>使用更早指令的写回值</td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sub x2, x1, x3</span><br><span class="line">and x12, x2, x5    # rs1 从 EX/MEM 前递</span><br><span class="line">or  x13, x6, x2    # 可从 MEM/WB 前递</span><br></pre></td></tr></table></figure>
+
+<h3 id="Load-use-冒险"><a href="#Load-use-冒险" class="headerlink" title="Load-use 冒险"></a>Load-use 冒险</h3><p>紧跟在 load 后面的指令若立即使用载入结果，即使有前递也通常要停顿一个周期，因为数据要到 MEM 结束后才可用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lw  x2, 10(x1)</span><br><span class="line">and x4, x2, x5</span><br></pre></td></tr></table></figure>
+
+<p>检测到冒险后，冻结 PC 和 <code>IF/ID</code>，并把进入 EX 的控制信号清零，等效于插入一个 NOP。停顿后，load 的结果可从 <code>MEM/WB</code> 前递到使用者的 EX 阶段。</p>
+<h3 id="控制冒险"><a href="#控制冒险" class="headerlink" title="控制冒险"></a>控制冒险</h3><p>常见处理方式包括静态预测“不跳转”、尽早计算分支条件和目标地址，以及动态分支预测。两位饱和计数器用四个状态记录强&#x2F;弱跳转倾向，实际跳转时向“跳转”方向更新，反之向“不跳转”方向更新。</p>
+<p><img src="/images/computer-architecture/branch-predictor.png" alt="两位饱和计数器分支预测"></p>
+<p>预测错误时需要冲刷流水线中错误路径上的指令。</p>
+<h2 id="存储层次、TLB、页表与-Cache"><a href="#存储层次、TLB、页表与-Cache" class="headerlink" title="存储层次、TLB、页表与 Cache"></a>存储层次、TLB、页表与 Cache</h2><h3 id="地址转换与数据访问"><a href="#地址转换与数据访问" class="headerlink" title="地址转换与数据访问"></a>地址转换与数据访问</h3><p>TLB 和页表解决“虚拟地址对应哪个物理地址”，Cache 解决“怎样更快取得该物理地址中的内容”。典型过程为：</p>
+<ol>
+<li>CPU 产生虚拟地址 $VA&#x3D;VPN+Page\ Offset$。</li>
+<li>查 TLB；命中时得到物理页号，未命中时查页表。</li>
+<li>页表项无效时触发缺页异常，由操作系统调入页面。</li>
+<li>得到 $PA&#x3D;PPN+Page\ Offset$ 后访问 Cache；Cache 未命中再访问主存。</li>
+</ol>
+<p>块地址与字节地址的关系是：</p>
+<p>$$<br>\mathrm{block\ address}&#x3D;\left\lfloor\frac{\mathrm{byte\ address}}{\mathrm{bytes\ per\ block}}\right\rfloor<br>$$</p>
+<h3 id="Cache-地址划分"><a href="#Cache-地址划分" class="headerlink" title="Cache 地址划分"></a>Cache 地址划分</h3><p>地址通常拆为 <code>Tag | Index | Offset</code>。若块大小为 $2^b$ 字节，则 Offset 占 $b$ 位；若共有 $2^s$ 个组，则 Index 占 $s$ 位，其余为 Tag。</p>
+<table>
+<thead>
+<tr>
+<th>映射方式</th>
+<th>主存块可放置位置</th>
+<th>地址中的 Index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>直接映射</td>
+<td>唯一 Cache 行</td>
+<td>行索引</td>
+</tr>
+<tr>
+<td>全相联</td>
+<td>任意 Cache 行</td>
+<td>无</td>
+</tr>
+<tr>
+<td>$N$ 路组相联</td>
+<td>固定组内任意一路</td>
+<td>组索引</td>
+</tr>
+</tbody></table>
+<p>每个 Cache 行除数据外还包含 Valid 和 Tag。写回策略还需要 Dirty 位；写直达策略在每次写 Cache 时同步更新下层存储，通常不需要 Dirty 位。</p>
+<p>直接映射无需替换算法。组相联和全相联可使用 LRU、FIFO 或 Random。精确 LRU 必须记录组内访问顺序，所需状态通常多于简单的 $\log_2N$ 位；实际处理器常使用近似 LRU 来降低硬件成本。</p>
+<h2 id="CPU-与主存连接及-RAM-扩展"><a href="#CPU-与主存连接及-RAM-扩展" class="headerlink" title="CPU 与主存连接及 RAM 扩展"></a>CPU 与主存连接及 RAM 扩展</h2><h3 id="存储层次"><a href="#存储层次" class="headerlink" title="存储层次"></a>存储层次</h3><p>从靠近 CPU 到远离 CPU，典型层次依次为寄存器、Cache、主存和辅存。越靠近 CPU，速度通常越快、单位容量成本越高、容量越小。Cache 通常采用 SRAM，主存通常采用 DRAM，SSD 使用闪存，HDD 使用磁性介质。</p>
+<h3 id="三类总线"><a href="#三类总线" class="headerlink" title="三类总线"></a>三类总线</h3><p>CPU 与主存通过地址、数据和控制总线连接：</p>
+<ul>
+<li>地址总线指定访问位置，其宽度决定可寻址范围。</li>
+<li>数据总线传输读写数据，其宽度影响一次传输的数据量。</li>
+<li>控制总线传递读写、片选、访存请求等控制信号。</li>
+</ul>
+<p>存储芯片规格写作 $a\times b$ 时，$a$ 表示存储单元数量，$b$ 表示每个单元的位数。容量扩展分为：</p>
+<ul>
+<li>位扩展：芯片并联，地址线和控制线共用，各芯片承担数据字的一部分。</li>
+<li>字扩展：增加地址空间，用高位地址经译码器产生片选信号。</li>
+<li>字位同时扩展：先并联完成位扩展，再分组完成字扩展。</li>
+</ul>
+<p><img src="/images/computer-architecture/ram-expansion.png" alt="使用 1K x 4 芯片构建更大 RAM"></p>
+<p>例如，用 <code>1K x 4</code> 芯片构建 <code>4K x 8</code> RAM：两片并联组成 <code>1K x 8</code>，共需要四组，即 8 片。低 10 位地址连接每一片芯片，高 2 位地址经 2-4 译码器选择四组之一，地址范围依次为 <code>000H-3FFH</code>、<code>400H-7FFH</code>、<code>800H-BFFH</code> 和 <code>C00H-FFFH</code>。</p>
+<p>一般可分别计算字扩展倍数和位扩展倍数：</p>
+<p>$$<br>N_{chips}&#x3D;\frac{\text{目标字数}}{\text{单片字数}}\times<br>\frac{\text{目标字长}}{\text{单片字长}}<br>$$</p>
+<h2 id="数据校验：海明码与-CRC"><a href="#数据校验：海明码与-CRC" class="headerlink" title="数据校验：海明码与 CRC"></a>数据校验：海明码与 CRC</h2><h3 id="海明码与-SEC-DED"><a href="#海明码与-SEC-DED" class="headerlink" title="海明码与 SEC&#x2F;DED"></a>海明码与 SEC&#x2F;DED</h3><p>若数据位有 $n$ 位、海明校验位有 $k$ 位，为定位全部单比特错误并表示“无错”，需要满足：</p>
+<p>$$<br>2^k\ge n+k+1<br>$$</p>
+<p>校验位放在编号为 $1,2,4,8,\ldots$ 的位置，其余位置填数据位。每个校验位负责位置编号的二进制表示中对应位为 1 的位置。</p>
+<p><img src="/images/computer-architecture/hamming-code.png" alt="海明码校验位覆盖关系"></p>
+<p>以 4 个数据位和 3 个校验位为例：</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内容</td>
+<td>$P_1$</td>
+<td>$P_2$</td>
+<td>$D_1$</td>
+<td>$P_3$</td>
+<td>$D_2$</td>
+<td>$D_3$</td>
+<td>$D_4$</td>
+</tr>
+</tbody></table>
+<p>偶校验下：</p>
+<p>$$<br>\begin{array}{l}<br>P_1&#x3D;D_1\oplus D_2\oplus D_4 \\<br>P_2&#x3D;D_1\oplus D_3\oplus D_4 \\<br>P_3&#x3D;D_2\oplus D_3\oplus D_4<br>\end{array}<br>$$</p>
+<p>接收端重新计算得到指误字 $S$。普通海明码可以定位并纠正一位错误。再增加一个全局奇偶校验位，就得到 SEC&#x2F;DED：</p>
+<table>
+<thead>
+<tr>
+<th>指误字 $S$</th>
+<th>全局奇偶校验</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>正确</td>
+<td>无错</td>
+</tr>
+<tr>
+<td>非 0</td>
+<td>错误</td>
+<td>单比特错误，可定位并纠正</td>
+</tr>
+<tr>
+<td>非 0</td>
+<td>正确</td>
+<td>双比特错误，可检测但不可纠正</td>
+</tr>
+<tr>
+<td>0</td>
+<td>错误</td>
+<td>全局校验位本身错误</td>
+</tr>
+</tbody></table>
+<p>SEC&#x2F;DED 的结论以最多发生两位错误为前提；超出设计错误模型时，不能保证正确分类。</p>
+<h3 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h3><p>发送端与接收端先约定生成多项式 $G(X)$。若其最高次数为 $R$，则 CRC 余数固定为 $R$ 位。编码步骤为：</p>
+<ol>
+<li>在信息码末尾补 $R$ 个 0，相当于乘以 $X^R$。</li>
+<li>使用生成多项式进行模 2 除法，加减均为 XOR，不产生进位或借位。</li>
+<li>把 $R$ 位余数填入末尾，形成发送码字。</li>
+</ol>
+<p>接收端用同一生成多项式相除。余数为 0 时认为未检测到错误，非 0 时判定传输出错。工程中 CRC 主要用于检错，发现错误后通常丢弃并重传，而不是直接纠错。</p>
+<h2 id="I-O-子系统"><a href="#I-O-子系统" class="headerlink" title="I&#x2F;O 子系统"></a>I&#x2F;O 子系统</h2><h3 id="端口与编址"><a href="#端口与编址" class="headerlink" title="端口与编址"></a>端口与编址</h3><p>I&#x2F;O 接口通常包含数据、状态和控制寄存器，并负责地址译码、缓冲、数据格式转换及跨时钟域协调。</p>
+<p>RISC-V 通常采用内存映射 I&#x2F;O（MMIO）：设备寄存器占用统一地址空间，CPU 使用普通 load&#x2F;store 指令访问。独立编址 I&#x2F;O 则使用单独的 I&#x2F;O 地址空间和专用指令，典型例子是 x86 的 <code>IN</code>、<code>OUT</code>。</p>
+<h3 id="三种控制方式"><a href="#三种控制方式" class="headerlink" title="三种控制方式"></a>三种控制方式</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>工作方式</th>
+<th>主要特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>程序查询</td>
+<td>CPU 循环读取状态寄存器</td>
+<td>硬件简单，但忙等待浪费 CPU 时间</td>
+</tr>
+<tr>
+<td>中断驱动</td>
+<td>设备就绪后请求中断</td>
+<td>CPU 可先执行其他任务，但频繁中断有额外开销</td>
+</tr>
+<tr>
+<td>DMA</td>
+<td>控制器在设备与主存间成块传输</td>
+<td>CPU 不必处理每个字，只负责配置和完成处理</td>
+</tr>
+</tbody></table>
+<p>DMA 能显著减少 CPU 参与，但 DMA 控制器和 CPU 仍可能竞争内存总线，因此不能理解为始终完全并行。一次典型 DMA 传输由 CPU 配置起始地址、设备、长度和方向，DMA 控制器执行传输，结束后再用中断通知 CPU。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Memory/" rel="tag"># Memory</a>
+              <a href="/tags/RISC-V/" rel="tag"># RISC-V</a>
+              <a href="/tags/CPU/" rel="tag"># CPU</a>
+              <a href="/tags/Cache/" rel="tag"># Cache</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/08/06/agent-async-runtime-and-tool-calling/" rel="prev" title="Agent 运行时基础：异步执行、工具调用与上下文管理">
+                  <i class="fa fa-angle-left"></i> Agent 运行时基础：异步执行、工具调用与上下文管理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/08/10/arch-neovim-markdown-preview/" rel="next" title="Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录">
+                  Arch Linux 上 Neovim + markdown-preview 实时预览搭建与踩坑全记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-snowflake"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">pdd4real</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

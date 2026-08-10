@@ -1386,7 +1386,7 @@ pre code {
     transition: all 0.2s ease-in-out;
   }
   .links-of-author a::before {
-    background: #ff9ffc;
+    background: #302e1d;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2575,6 +2575,12 @@ mark.search-keyword {
   color: #ff2a2a;
   font-weight: bold;
 }
+.has-jax {
+  overflow: auto hidden;
+}
+mjx-container[display='true'] + br {
+  display: none;
+}
 .use-motion .animated {
   animation-fill-mode: none;
   visibility: inherit;
@@ -2903,5 +2909,82 @@ header.header {
   }
   .comments {
     padding: 10px 12px;
+  }
+}
+.sidebar {
+  background: transparent;
+}
+.sidebar-inner {
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+.post-body mjx-container[display='true'] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+.post-body mjx-container[display='true'] > svg {
+  max-width: none;
+}
+header.header,
+.main-inner .post-block,
+.main-inner .post-block:not(:first-child):not(:first-child),
+.main-inner .tabs-comment,
+.main-inner > .comments,
+.main-inner .comment-position .comments,
+.main-inner .pagination,
+.sidebar-inner {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.main-inner .post-block,
+.main-inner .pagination {
+  box-shadow: 0 8px 22px rgba(2,15,28,0.24);
+}
+.main-inner.index .post-block {
+  margin-top: 14px !important;
+  padding: 22px 30px;
+}
+.main-inner.index .post-block:first-child {
+  margin-top: 0 !important;
+}
+.main-inner.index .post-header {
+  margin-bottom: 8px;
+}
+.main-inner.index .post-title {
+  font-size: 1.35em;
+  margin: 0 0 5px;
+}
+.main-inner.index .post-meta-container {
+  margin-top: 4px;
+}
+.main-inner.index .post-body {
+  margin-top: 8px;
+}
+.main-inner.index .post-body p {
+  margin: 0 0 8px;
+}
+.main-inner.index .post-button {
+  margin-top: 8px;
+}
+.main-inner.index .post-button .btn {
+  border-radius: 8px;
+  padding: 5px 13px;
+}
+@media (max-width: 767px) {
+  header.header,
+  .main-inner .post-block,
+  .main-inner .post-block:not(:first-child):not(:first-child),
+  .main-inner .pagination,
+  .sidebar-inner {
+    border-radius: 10px !important;
+  }
+  .main-inner.index .post-block {
+    margin-top: 10px !important;
+    padding: 16px;
+  }
+  .main-inner.index .post-title {
+    font-size: 1.2em;
   }
 }
